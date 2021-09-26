@@ -239,11 +239,11 @@
     (vec-new)
     (write (dir->content (!!- stack 1)) (last-of stack))
     (delete-last stack)
-    (unless (= parent 0)
-      (add-ptr-to-directory (last-of stack) parent)))
+    (add-ptr-to-directory (last-of stack) parent))
 
   (proc (add-ptr-to-directory ptr dir)
-    (vec-push (dir->content dir) ptr))
+    (unless (= 0 ptr)
+      (vec-push (dir->content dir) ptr)))
 
   (proc (heap-dump)
     (println ">heap-dump")
