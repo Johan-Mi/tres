@@ -72,6 +72,7 @@
 ;
 ; ## Vec
 ; - Memory block size (capacity + 2)
+; - "Vec"
 ; - Length of vector
 ; - Items...
 
