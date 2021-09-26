@@ -49,6 +49,13 @@
 (macro (dir->content ptr)
        (+ 4 ,ptr))
 
+(macro (file->name ptr)
+       (+ 2 ,ptr))
+(macro (file->parent ptr)
+       (+ 3 ,ptr))
+(macro (file->content ptr)
+       (+ 4 ,ptr))
+
 (macro (block->type ptr)
        (+ 1 ,ptr))
 
@@ -320,4 +327,12 @@
     ([]+= heap (vec->size (read vec)) 1)
     (write
       (vec->at (read vec) (vec.size (read vec)))
-      value)))
+      value))
+
+  (proc (create-file name parent content)
+    (heap-allocate 4)
+    (write (block->type (last-of stack)) "File")
+    (write (file->name (last-of stack)) name)
+    (write (file->parent (last-of stack)) parent)
+    (write (file->content (last-of stack)) content)
+    (add-ptr-to-directory (last-of stack) parent)))
