@@ -311,7 +311,7 @@
   ; to a pointer to the vector so it can be changed in case of a reallocation.
   (proc (vec-push vec value)
     ; Reallocate if the vector is full
-    (when (= (vec->size (read vec))
+    (when (= (vec.size (read vec))
              (vec.cap (read vec)))
       (heap-reallocate (read vec) (+ 2 (* 2 (vec.size (read vec)))))
       (write vec (last-of stack))
