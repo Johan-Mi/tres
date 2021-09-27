@@ -39,22 +39,23 @@
        (!! heap (+ 2 ,ptr)))
 (macro (vec->at ptr i)
        (+ 2 ,ptr ,i))
+(macro (vec.at ptr i)
+       (!! heap (+ 2 ,ptr ,i)))
 (macro (vec.cap ptr)
        (- (!! heap ,ptr) 2))
 
-(macro (dir->name ptr)
-       (+ 2 ,ptr))
-(macro (dir->parent ptr)
-       (+ 3 ,ptr))
-(macro (dir->content ptr)
-       (+ 4 ,ptr))
-
 (macro (file->name ptr)
        (+ 2 ,ptr))
+(macro (file.name ptr)
+       (!! heap (+ 2 ,ptr)))
 (macro (file->parent ptr)
        (+ 3 ,ptr))
+(macro (file.parent ptr)
+       (!! heap (+ 3 ,ptr)))
 (macro (file->content ptr)
        (+ 4 ,ptr))
+(macro (file.content ptr)
+       (!! heap (+ 4 ,ptr)))
 
 (macro (block->type ptr)
        (+ 1 ,ptr))
@@ -71,6 +72,8 @@
 ; - File content
 ;
 ; ## Directory
+; Just like a file except the content is a pointer to a vector of the contained
+; files.
 ; - Memory block size
 ; - "Directory"
 ; - Name of directory
@@ -92,7 +95,8 @@
   (variables i
              j
              fs-root
-             panic-message)
+             panic-message
+             lexer-buf)
 
   (lists stack
          heap
@@ -105,7 +109,7 @@
     (create-fs-root)
     (create-directory "bin" fs-root)
     (create-directory "etc" fs-root)
-    (heap-dump))
+    (ls "/" "/"))
 
   (proc (term-init)
     (erase-all)
@@ -176,6 +180,10 @@
     (unless (= condition "true")
       (panic message)))
 
+  (proc (handle-stack-error message)
+    (when (< (last-of stack) 0)
+      (panic message)))
+
   (proc (heap-f1 size)
     (for j (+ size 1)
       (unless (= 0 (!! heap-refcounts (+ i j -1)))
@@ -241,16 +249,16 @@
   (proc (create-directory name parent)
     (heap-allocate 4)
     (write (block->type (last-of stack)) "Directory")
-    (write (dir->name (last-of stack)) name)
-    (write (dir->parent (last-of stack)) parent)
+    (write (file->name (last-of stack)) name)
+    (write (file->parent (last-of stack)) parent)
     (vec-new)
-    (write (dir->content (!!- stack 1)) (last-of stack))
+    (write (file->content (!!- stack 1)) (last-of stack))
     (delete-last stack)
     (add-ptr-to-directory (last-of stack) parent))
 
   (proc (add-ptr-to-directory ptr dir)
-    (unless (= 0 ptr)
-      (vec-push (dir->content dir) ptr)))
+    (unless (= 0 dir)
+      (vec-push (file->content dir) ptr)))
 
   (proc (heap-dump)
     (println ">heap-dump")
@@ -335,4 +343,48 @@
     (write (file->name (last-of stack)) name)
     (write (file->parent (last-of stack)) parent)
     (write (file->content (last-of stack)) content)
-    (add-ptr-to-directory (last-of stack) parent)))
+    (add-ptr-to-directory (last-of stack) parent))
+
+  (proc (resolve-path cwd path)
+    (if (= "/" (char-at path 1))
+      (append stack fs-root)
+      (append stack cwd))
+    (:= lexer-buf "")
+    (for i (+ 1 (str-length path)) ; +1 for a trailing slash
+      (if (or (= i (+ 1 (str-length path)))
+              (= "/" (char-at path i)))
+        (then
+          (cond
+            (or (= "" lexer-buf)
+                (= "." lexer-buf))
+            (then) ; Stay in the current directory
+
+            (and (= ".." lexer-buf)
+                 (!= 0 (file.parent (last-of stack))))
+            (then ; Go up a directory
+              (replace-last stack (file.parent (last-of stack))))
+
+            (else
+              (find-name-in-directory lexer-buf)
+              (handle-stack-error
+                (++ "resolve-path: Could not resolve path `" path "`"))))
+          (:= lexer-buf ""))
+        (else
+          (:= lexer-buf (++ lexer-buf (char-at path i)))))))
+
+  (proc (find-name-in-directory name)
+    (replace-last stack (file.content (last-of stack)))
+    (for i (vec.size (last-of stack))
+      (:= i (vec.at (last-of stack) i))
+      (when (= name (file.name i))
+        (replace-last stack i)
+        (stop-this-script)))
+    (replace-last stack -1))
+
+  (proc (ls cwd path)
+    (resolve-path cwd path)
+    (println (++ "Listing of " path ":"))
+    (replace-last stack (file.content (last-of stack)))
+    (for i (vec.size (last-of stack))
+      (println (file.name (vec.at (last-of stack) i))))
+    (delete-last stack)))
