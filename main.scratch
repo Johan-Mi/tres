@@ -36,12 +36,12 @@
 (macro (make-field-arrow name offset)
        (macro (,name ptr)
               (+ ,offset ,,ptr)))
-(macro (make-field-dot arrow-name dot-name)
-       (macro (,dot-name ptr)
-              (read (,arrow-name ,,ptr))))
+(macro (make-field-dot base-name field-name)
+       (macro ((sym-concat! ,base-name . ,field-name) ptr)
+              (read ((sym-concat! ,base-name -> ,field-name) ,,ptr))))
 
 (make-field-arrow vec->size 2)
-(make-field-dot vec->size vec.size)
+(make-field-dot vec size)
 (macro (vec->at ptr i)
        (+ 2 ,ptr ,i))
 (macro (vec.at ptr i)
@@ -50,14 +50,14 @@
        (- (!! heap ,ptr) 2))
 
 (make-field-arrow file->name 2)
-(make-field-dot file->name file.name)
+(make-field-dot file name)
 (make-field-arrow file->parent 3)
-(make-field-dot file->parent file.parent)
+(make-field-dot file parent)
 (make-field-arrow file->content 4)
-(make-field-dot file->content file.content)
+(make-field-dot file content)
 
 (make-field-arrow block->type 1)
-(make-field-dot block->type block.type)
+(make-field-dot block type)
 
 (macro CHAR-NEWLINE "¦")
 
