@@ -33,8 +33,11 @@
 
 (macro VEC-INITIAL-CAPACITY 2)
 
-(macro (vec->size ptr)
-       (+ 2 ,ptr))
+(macro (make-field-arrow name offset)
+       (macro (,name ptr)
+              (+ ,offset ,,ptr)))
+
+(make-field-arrow vec->size 2)
 (macro (vec.size ptr)
        (read (vec->size ,ptr)))
 (macro (vec->at ptr i)
@@ -44,21 +47,17 @@
 (macro (vec.cap ptr)
        (- (!! heap ,ptr) 2))
 
-(macro (file->name ptr)
-       (+ 2 ,ptr))
+(make-field-arrow file->name 2)
 (macro (file.name ptr)
        (read (file->name ,ptr)))
-(macro (file->parent ptr)
-       (+ 3 ,ptr))
+(make-field-arrow file->parent 3)
 (macro (file.parent ptr)
        (read (file->parent ,ptr)))
-(macro (file->content ptr)
-       (+ 4 ,ptr))
+(make-field-arrow file->content 4)
 (macro (file.content ptr)
        (read (file->content ,ptr)))
 
-(macro (block->type ptr)
-       (+ 1 ,ptr))
+(make-field-arrow block->type 1)
 
 (macro CHAR-NEWLINE "¦")
 
