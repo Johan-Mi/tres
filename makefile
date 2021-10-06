@@ -1,8 +1,8 @@
-project.sb3: program.scratch
+project.sb3: program.scratch assets/**/*
 	scratch-compiler-exe
 
-program.scratch: main.scratch char-costumes.scratch assets/**/*
-	cpp -w -nostdinc -P main.scratch -o program.scratch
+program.scratch: src/*.scratch
+	cpp -w -nostdinc -P src/main.scratch -o program.scratch
 
 .PHONY: clean
 clean:
