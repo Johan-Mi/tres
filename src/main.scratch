@@ -1,63 +1,15 @@
-(macro then do)
-(macro else do)
-
-(macro (!= a b)
-       (not (= ,a ,b)))
-
-(macro ([]+= lst idx val)
-       (replace ,lst ,idx (+ (!! ,lst ,idx) ,val)))
-
-(macro (!!- lst idx)
-       (!! ,lst (- (length ,lst) ,idx)))
-
-(macro (last-of lst)
-       (!! ,lst "last"))
-
-(macro (delete-last lst)
-       (delete ,lst "last"))
-
-(macro (replace-last lst val)
-       (replace ,lst "last" ,val))
+(include "src/basic-macros.scratch")
+(include "src/fields.scratch")
+(include "src/char-costumes.scratch")
 
 (macro (assert condition message)
        (real-assert ,condition ,message))
-
-(macro (read idx)
-       (!! heap ,idx))
-(macro (write idx val)
-       (replace heap ,idx ,val))
 
 (macro CHAR-HEIGHT 12)
 (macro CHAR-WIDTH 8)
 (macro CHAR-SCALE 200)
 
 (macro VEC-INITIAL-CAPACITY 2)
-
-(macro (make-field-arrow name offset)
-       (macro (,name ptr)
-              (+ ,offset ,,ptr)))
-(macro (make-field-dot base-name field-name)
-       (macro ((sym-concat! ,base-name . ,field-name) ptr)
-              (read ((sym-concat! ,base-name -> ,field-name) ,,ptr))))
-
-(make-field-arrow vec->size 2)
-(make-field-dot vec size)
-(macro (vec->at ptr i)
-       (+ 2 ,ptr ,i))
-(macro (vec.at ptr i)
-       (read (vec->at ,ptr ,i)))
-(macro (vec.cap ptr)
-       (- (!! heap ,ptr) 2))
-
-(make-field-arrow file->name 2)
-(make-field-dot file name)
-(make-field-arrow file->parent 3)
-(make-field-dot file parent)
-(make-field-arrow file->content 4)
-(make-field-dot file content)
-
-(make-field-arrow block->type 1)
-(make-field-dot block type)
 
 (macro CHAR-NEWLINE "¦")
 
@@ -89,7 +41,7 @@
   (costumes "backdrop" "assets/backdrop.png"))
 
 (sprite "main"
-  #include "char-costumes.scratch"
+  char-costumes
 
   (variables i
              j

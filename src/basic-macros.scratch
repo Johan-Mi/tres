@@ -1,0 +1,20 @@
+(macro then do)
+(macro else do)
+
+(macro (!= a b)
+       (not (= ,a ,b)))
+
+(macro ([]+= lst idx val)
+       (replace ,lst ,idx (+ (!! ,lst ,idx) ,val)))
+
+(macro (!!- lst idx)
+       (!! ,lst (- (length ,lst) ,idx)))
+
+(macro (last-of lst)
+       (!! ,lst "last"))
+
+(macro (delete-last lst)
+       (delete ,lst "last"))
+
+(macro (replace-last lst val)
+       (replace ,lst "last" ,val))
