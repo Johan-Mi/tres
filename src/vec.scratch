@@ -1,0 +1,25 @@
+; Creates a new vector with the default capacity defined by
+; `VEC-INITIAL-CAPACITY`. A pointer to the vector gets pushed onto the stack.
+(proc (vec-new)
+  (vec-with-capacity VEC-INITIAL-CAPACITY))
+
+; Like `vec-new` but it lets you choose an initial capacity.
+(proc (vec-with-capacity cap)
+  (heap-allocate (+ 2 cap))
+  (write (block->type (last-of stack)) "Vec")
+  (write (vec->size (last-of stack)) 0))
+
+; Append a value to a heap-allocated vector. The `vec` parameter is a pointer
+; to a pointer to the vector so it can be changed in case of a reallocation.
+(proc (vec-push vec value)
+  ; Reallocate if the vector is full
+  (when (= (vec.size (read vec))
+           (vec.cap (read vec)))
+    (heap-reallocate (read vec) (+ 2 (* 2 (vec.size (read vec)))))
+    (write vec (last-of stack))
+    (delete-last stack))
+
+  ([]+= heap (vec->size (read vec)) 1)
+  (write
+    (vec->at (read vec) (vec.size (read vec)))
+    value))
