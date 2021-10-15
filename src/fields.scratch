@@ -1,8 +1,3 @@
-(macro (read idx)
-       (!! heap ,idx))
-(macro (write idx val)
-       (replace heap ,idx ,val))
-
 (macro (make-field-arrow name offset)
        (macro (,name ptr)
               (+ ,offset ,,ptr)))

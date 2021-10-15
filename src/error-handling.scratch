@@ -1,16 +1,20 @@
-(variables panic-message)
+(macro (assert condition message)
+       (real-assert ,condition ,message))
 
-; Terminate the program with a message.
-(proc (panic message)
-  (:= panic-message message)
-  (println (++ "Panic! " panic-message))
-  (stop-all))
+(sprite "main"
+  (variables panic-message)
 
-; Panic if a condition is not met.
-(proc (real-assert condition message)
-  (unless (= condition "true")
-    (panic message)))
+  ; Terminate the program with a message.
+  (proc (panic message)
+    (:= panic-message message)
+    (println (++ "Panic! " panic-message))
+    (stop-all))
 
-(proc (handle-stack-error message)
-  (when (< (last-of stack) 0)
-    (panic message)))
+  ; Panic if a condition is not met.
+  (proc (real-assert condition message)
+    (unless (= condition "true")
+      (panic message)))
+
+  (proc (handle-stack-error message)
+    (when (< (last-of stack) 0)
+      (panic message))))

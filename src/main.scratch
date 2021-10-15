@@ -1,16 +1,10 @@
 (include "src/basic-macros.scratch")
+(include "src/error-handling.scratch")
 (include "src/fields.scratch")
-
-(macro (assert condition message)
-       (real-assert ,condition ,message))
-
-(macro CHAR-HEIGHT 12)
-(macro CHAR-WIDTH 8)
-(macro CHAR-SCALE 200)
-
-(macro VEC-INITIAL-CAPACITY 2)
-
-(macro CHAR-NEWLINE "¦")
+(include "src/terminal.scratch")
+(include "src/heap.scratch")
+(include "src/vec.scratch")
+(include "src/fs.scratch")
 
 ; # Memory layout
 ;
@@ -40,12 +34,6 @@
   (costumes "backdrop" "assets/backdrop.png"))
 
 (sprite "main"
-  (include "src/terminal.scratch")
-  (include "src/heap.scratch")
-  (include "src/error-handling.scratch")
-  (include "src/vec.scratch")
-  (include "src/fs.scratch")
-
   (variables i
              j
              lexer-buf)
