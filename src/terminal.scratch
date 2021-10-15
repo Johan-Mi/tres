@@ -8,6 +8,7 @@
 
   (proc (term-init)
     (erase-all)
+    (hide)
     (set-xy -232 172)
     (set-size CHAR-SCALE))
 
@@ -19,9 +20,7 @@
       (else
         (set-costume "[unknown]")
         (set-costume char)
-        (show)
         (stamp)
-        (hide)
         (move-cursor-right))))
 
   ; Move the terminal cursor right by one characer, possibly switching to the
