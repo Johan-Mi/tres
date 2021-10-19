@@ -41,11 +41,11 @@
           (++= lexer-buf (char-at str i))))))
 
   (proc (interp-step interp)
+    (:= ip (+ 1 (interp.ip interp)))
     (assert (< ip (vec.size (interp.tokens interp)))
             (++ "interp-step: ip "
                 (+ 1 ip)
                 " is out of bounds"))
-    (:= ip (+ 1 (interp.ip interp)))
 
     (write (interp->ip interp) ip)
     (:= curr-token (vec.at (interp.tokens interp) ip))
