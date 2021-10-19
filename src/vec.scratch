@@ -1,3 +1,9 @@
+; # Vec
+; - Memory block size (capacity + 2)
+; - "Vec"
+; - Length of vector
+; - Items...
+
 (macro VEC-INITIAL-CAPACITY 2)
 
 (sprite "main"
@@ -20,7 +26,7 @@
              (vec.cap (read vec)))
       (heap-reallocate (read vec) (+ 2 (* 2 (vec.size (read vec)))))
       (write vec (last-of stack))
-      (delete-last stack))
+      (pop))
 
     ([]+= heap (vec->size (read vec)) 1)
     (write

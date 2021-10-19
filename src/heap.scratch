@@ -67,7 +67,7 @@
     (when (= (!! heap-refcounts ptr) 0)
       (append stack ptr)
       (send-broadcast-sync (++ "_switch_heap_deallocate_" (block.type ptr)))
-      (delete-last stack)
+      (pop)
       (for i (read ptr)
         (write (+ ptr i) "")
         (replace heap-refcounts (+ ptr i) 0))

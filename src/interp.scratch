@@ -1,0 +1,55 @@
+; # Interpreter
+; - Memory block size
+; - "Interpreter"
+; - Pointer to vector of tokens
+; - Instruction pointer
+; - Pointer to stack
+
+(sprite "main"
+  (variables ip
+             curr-token
+             interp-responded)
+
+  (proc (interp-spawn-from-src src)
+    (interp-new)
+    (interp-lex (last-of stack) src)
+    (vec-push process-table (last-of stack))
+    (pop))
+
+  (proc (interp-new)
+    (heap-allocate 4)
+    (write (block->type (last-of stack)) "Interpreter")
+    (write (interp->ip (last-of stack)) 0)
+    (vec-new)
+    (write (interp->tokens (!!- stack 1)) (last-of stack))
+    (pop)
+    (vec-new)
+    (write (interp->stack (!!- stack 1)) (last-of stack))
+    (pop))
+
+  (proc (interp-lex interp str)
+    (:= lexer-buf "")
+    (for i (+ 1 (str-length str)) ; +1 to correctly push the last token
+      (if (or (= i (+ 1 (str-length str)))
+              (= " " (char-at str i)))
+        (then
+          (unless (= "" lexer-buf)
+            (vec-push (interp.tokens interp) lexer-buf)
+            (:= lexer-buf "")))
+        (else
+          (++= lexer-buf (char-at str i))))))
+
+  (proc (interp-step interp)
+    (:= ip (+ 1 (interp.ip interp)))
+    (write (interp->ip interp) ip)
+    (:= curr-token (vec.at (interp.tokens interp) ip))
+    (cond
+      (is-number curr-token)
+      (then
+        (vec-push (interp.stack interp) curr-token))
+
+      (else
+        (:= interp-responded false)
+        (send-broadcast-sync (++ "_switch_interp_step_" curr-token))
+        (assert interp-responded
+                (++ "interp-step: unknown instruction `" curr-token "`"))))))

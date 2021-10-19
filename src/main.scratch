@@ -5,30 +5,8 @@
 (include "src/heap.scratch")
 (include "src/vec.scratch")
 (include "src/fs.scratch")
-
-; # Memory layout
-;
-; ## File
-; - Memory block size
-; - "File"
-; - Name of file
-; - Pointer to parent directory
-; - File content
-;
-; ## Directory
-; Just like a file except the content is a pointer to a vector of the contained
-; files.
-; - Memory block size
-; - "Directory"
-; - Name of directory
-; - Pointer to parent directory
-; - Pointer to vector of contained files
-;
-; ## Vec
-; - Memory block size (capacity + 2)
-; - "Vec"
-; - Length of vector
-; - Items...
+(include "src/interp.scratch")
+(include "src/process.scratch")
 
 (sprite "Stage"
   (costumes "backdrop" "assets/backdrop.png"))
@@ -45,9 +23,12 @@
     (heap-init)
     (term-init)
     (create-fs-root)
+    (processes-init)
     (create-directory "bin" fs-root)
     (create-directory "etc" fs-root)
-    (ls "/" "/"))
+    (ls "/" "/")
+    (forever
+      (processes-step)))
 
   (proc (stack-init)
     (delete-all stack))
@@ -68,8 +49,8 @@
                        (last-of stack)
                        "│"
                        (!! heap-refcounts i)))))
-      (delete-last stack)
-      (delete-last stack)))
+      (pop)
+      (pop)))
 
   ; Force a string to a certain width by truncating it or filling the remaining
   ; space to the right with a given character. The result gets pushed onto the
@@ -96,4 +77,4 @@
     (replace-last stack (file.content (last-of stack)))
     (for i (vec.size (last-of stack))
       (println (file.name (vec.at (last-of stack) i))))
-    (delete-last stack)))
+    (pop)))

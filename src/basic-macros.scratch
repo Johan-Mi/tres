@@ -1,8 +1,14 @@
 (macro then do)
 (macro else do)
 
+(macro true "true")
+(macro false "false")
+
 (macro (!= a b)
        (not (= ,a ,b)))
+
+(macro (++= a b)
+       (:= ,a (++ ,a ,b)))
 
 (macro ([]+= lst idx val)
        (replace ,lst ,idx (+ (!! ,lst ,idx) ,val)))
@@ -18,3 +24,15 @@
 
 (macro (replace-last lst val)
        (replace ,lst "last" ,val))
+
+(macro (is-number str)
+       (or (= 0 ,str)
+           (= ,str (+ 0 ,str))))
+
+(macro (pop)
+       (delete-last stack))
+
+(macro (pop-to var)
+       (do
+         (:= ,var (last-of stack))
+         (pop)))

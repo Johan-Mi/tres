@@ -23,3 +23,10 @@
 
 (make-field-arrow block->type 1)
 (make-field-dot block type)
+
+(make-field-arrow interp->tokens 2)
+(make-field-dot interp tokens)
+(make-field-arrow interp->ip 3)
+(make-field-dot interp ip)
+(make-field-arrow interp->stack 4)
+(make-field-dot interp stack)

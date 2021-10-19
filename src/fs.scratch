@@ -1,10 +1,25 @@
+; # File
+; - Memory block size
+; - "File"
+; - Name of file
+; - Pointer to parent directory
+; - File content
+;
+; # Directory
+; Just like a file except the content is a pointer to a vector of the contained
+; files.
+; - Memory block size
+; - "Directory"
+; - Name of directory
+; - Pointer to parent directory
+; - Pointer to vector of contained files
+
 (sprite "main"
   (variables fs-root)
 
   (proc (create-fs-root)
     (create-directory "root" 0)
-    (:= fs-root (last-of stack))
-    (delete-last stack))
+    (pop-to fs-root))
 
   (proc (create-directory name parent)
     (heap-allocate 4)
@@ -13,7 +28,7 @@
     (write (file->parent (last-of stack)) parent)
     (vec-new)
     (write (file->content (!!- stack 1)) (last-of stack))
-    (delete-last stack)
+    (pop)
     (add-ptr-to-directory (last-of stack) parent))
 
   (proc (add-ptr-to-directory ptr dir)
