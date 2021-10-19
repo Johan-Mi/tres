@@ -71,6 +71,7 @@
           ":" "assets/chars/colon.png"
           ";" "assets/chars/semicolon.png"
           "/" "assets/chars/slash.png"
+          "!" "assets/chars/exclamation.png"
           "∞" "assets/chars/infinity.png"
           "│" "assets/chars/boxdrawing_light_vertical.png"
           "─" "assets/chars/boxdrawing_light_horizontal.png"
