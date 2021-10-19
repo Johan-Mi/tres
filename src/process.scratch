@@ -8,7 +8,6 @@
   (proc (processes-step)
     (when (= 0 (vec.size process-table))
       (panic "processes-step: process table is empty so nothing can happen"))
-    (print (vec.size (read process-table)))
 
     (for i (vec.size process-table)
       (interp-step (vec.at process-table i)))))

@@ -13,7 +13,8 @@
   (proc (interp-spawn-from-src src)
     (interp-new)
     (interp-lex (last-of stack) src)
-    (vec-push process-table (last-of stack))
+    (vec-push-stack process-table (last-of stack))
+    (pop-to process-table)
     (pop))
 
   (proc (interp-new)
@@ -34,19 +35,24 @@
               (= " " (char-at str i)))
         (then
           (unless (= "" lexer-buf)
-            (vec-push (interp.tokens interp) lexer-buf)
+            (vec-push (interp->tokens interp) lexer-buf)
             (:= lexer-buf "")))
         (else
           (++= lexer-buf (char-at str i))))))
 
   (proc (interp-step interp)
+    (assert (< ip (vec.size (interp.tokens interp)))
+            (++ "interp-step: ip "
+                (+ 1 ip)
+                " is out of bounds"))
     (:= ip (+ 1 (interp.ip interp)))
+
     (write (interp->ip interp) ip)
     (:= curr-token (vec.at (interp.tokens interp) ip))
     (cond
       (is-number curr-token)
       (then
-        (vec-push (interp.stack interp) curr-token))
+        (vec-push (interp->stack interp) curr-token))
 
       (else
         (:= interp-responded false)

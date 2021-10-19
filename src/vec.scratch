@@ -31,4 +31,21 @@
     ([]+= heap (vec->size (read vec)) 1)
     (write
       (vec->at (read vec) (vec.size (read vec)))
+      value))
+
+  ; Like `vec-push` but `vec` has one less level of indirection and the new
+  ; pointer gets pushed to the stack. This can be used instead of `vec-push` if
+  ; the pointer to the vector is not stored on the heap so it cannot be
+  ; modified.
+  (proc (vec-push-stack vec value)
+    (if (= (vec.size vec)
+           (vec.cap vec))
+      (then
+        (heap-reallocate vec (+ 2 (* 2 (vec.size vec)))))
+      (else
+        (append stack vec)))
+
+    ([]+= heap (vec->size (last-of stack)) 1)
+    (write
+      (vec->at (last-of stack) (vec.size (last-of stack)))
       value)))
