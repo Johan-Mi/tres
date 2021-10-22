@@ -39,6 +39,7 @@
 
   ; Print a string to the terminal.
   (proc (print string)
+    (variables i)
     (for i (str-length string)
       (putchar (char-at string i))))
 

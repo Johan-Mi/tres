@@ -12,10 +12,6 @@
   (costumes "backdrop" "assets/backdrop.png"))
 
 (sprite "main"
-  (variables i
-             j
-             lexer-buf)
-
   (lists stack)
 
   (proc (when-flag-clicked)
@@ -35,6 +31,7 @@
     (delete-all stack))
 
   (proc (heap-dump)
+    (variables i)
     (println ">heap-dump")
     (println "Ptr │Value                                   │Refcount")
     (println "────┼────────────────────────────────────────┼────────")
@@ -57,6 +54,7 @@
   ; space to the right with a given character. The result gets pushed onto the
   ; stack.
   (proc (rightpad string width padding-char)
+    (variables i)
     (cond
       (< (str-length string) width)
       (then
@@ -73,6 +71,7 @@
         (replace-last stack (++ (last-of stack) "…")))))
 
   (proc (ls cwd path)
+    (variables i)
     (resolve-path cwd path)
     (println (++ "Listing of " path ":"))
     (replace-last stack (file.content (last-of stack)))

@@ -6,6 +6,7 @@
     (pop-to process-table))
 
   (proc (processes-step)
+    (variables i)
     (when (= 0 (vec.size process-table))
       (panic "processes-step: process table is empty so nothing can happen"))
 

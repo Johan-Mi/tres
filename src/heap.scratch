@@ -4,29 +4,33 @@
        (replace heap ,idx ,val))
 
 (sprite "main"
+  (variables heap-allocate-index heap-allocate-found-block)
   (lists heap heap-refcounts)
 
   ; Make sure that a pointer points to the beginning of a valid memory block on
   ; the heap.
   (proc (validate-heap-ptr caller verb ptr)
-    (:= panic-message (++ caller
-                          ": Tried to "
-                          verb
-                          " index "
-                          ptr))
+    (variables message)
+    (:= message (++ caller
+                    ": Tried to "
+                    verb
+                    " index "
+                    ptr))
     (assert (> ptr 0)
-            (++ panic-message ", which is before the start of the heap"))
+            (++ message ", which is before the start of the heap"))
     (assert (not (> ptr (length heap)))
-            (++ panic-message ", which is after the end of the heap"))
+            (++ message ", which is after the end of the heap"))
     (assert (!! heap-refcounts ptr)
-            (++ panic-message ", which points to unallocated memory"))
+            (++ message ", which points to unallocated memory"))
     (assert (!= (!! heap-refcounts ptr) "Infinity")
-            (++ panic-message ", which is in the middle of a memory block")))
+            (++ message ", which is in the middle of a memory block")))
 
   (proc (heap-f1 size)
-    (for j (+ size 1)
-      (unless (= 0 (!! heap-refcounts (+ i j -1)))
-        (:= j -1)
+    (variables i)
+    (:= heap-allocate-found-block true)
+    (for i (+ size 1)
+      (unless (= 0 (!! heap-refcounts (+ heap-allocate-index i -1)))
+        (:= heap-allocate-found-block false)
         (stop-this-script))))
 
   ; Add a reference to a memory block.
@@ -37,15 +41,16 @@
   ; Obtain a memory block on the heap with a given size. A pointer to the block
   ; gets pushed onto the stack.
   (proc (heap-allocate size)
+    (variables i)
     ; Look for an unallocated block that's big enough
-    (for i (length heap)
+    (for heap-allocate-index (length heap)
       (heap-f1 size)
-      (unless (= j -1)
-        (append stack i)
-        (write i size)
-        (replace heap-refcounts i 1)
-        (for j size
-          (replace heap-refcounts (+ i j) "Infinity"))
+      (when (= heap-allocate-found-block true)
+        (append stack heap-allocate-index)
+        (write heap-allocate-index size)
+        (replace heap-refcounts heap-allocate-index 1)
+        (for i size
+          (replace heap-refcounts (+ heap-allocate-index i) "Infinity"))
         (stop-this-script)))
 
     ; No existing block found, grow the heap
@@ -62,6 +67,7 @@
   ; deallocated. When the message is received, a pointer to the block is
   ; available on the stack and should not be removed.
   (proc (heap-deallocate ptr)
+    (variables i)
     (validate-heap-ptr "heap-deallocate" "deallocate" ptr)
     ([]+= heap-refcounts ptr -1)
     (when (= (!! heap-refcounts ptr) 0)
@@ -80,6 +86,7 @@
   ; Resize a memory block. The new size must be at least as big as the old one.
   ; A pointer to the new block gets pushed onto the stack.
   (proc (heap-reallocate old-ptr new-size)
+    (variables i)
     (validate-heap-ptr "heap-reallocate" "move from" old-ptr)
     (assert (not (< new-size (read old-ptr)))
             "heap_reallocate: Tried to reallocate to a smaller memory block")

@@ -44,6 +44,7 @@
     (add-ptr-to-directory (last-of stack) parent))
 
   (proc (resolve-path cwd path)
+    (variables i lexer-buf)
     (if (= "/" (char-at path 1))
       (append stack fs-root)
       (append stack cwd))
@@ -71,6 +72,7 @@
           (:= lexer-buf (++ lexer-buf (char-at path i)))))))
 
   (proc (find-name-in-directory name)
+    (variables i)
     (replace-last stack (file.content (last-of stack)))
     (for i (vec.size (last-of stack))
       (:= i (vec.at (last-of stack) i))
