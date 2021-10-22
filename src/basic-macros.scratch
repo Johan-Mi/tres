@@ -7,6 +7,9 @@
 (macro (!= a b)
        (not (= ,a ,b)))
 
+(macro (-= a b)
+       (+= ,a (- ,b)))
+
 (macro (++= a b)
        (:= ,a (++ ,a ,b)))
 

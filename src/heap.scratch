@@ -4,7 +4,6 @@
        (replace heap ,idx ,val))
 
 (sprite "main"
-  (variables heap-allocate-index heap-allocate-found-block)
   (lists heap heap-refcounts)
 
   ; Make sure that a pointer points to the beginning of a valid memory block on
@@ -25,14 +24,6 @@
     (assert (!= (!! heap-refcounts ptr) "Infinity")
             (++ message ", which is in the middle of a memory block")))
 
-  (proc (heap-f1 size)
-    (variables i)
-    (:= heap-allocate-found-block true)
-    (for i (+ size 1)
-      (unless (= 0 (!! heap-refcounts (+ heap-allocate-index i -1)))
-        (:= heap-allocate-found-block false)
-        (stop-this-script))))
-
   ; Add a reference to a memory block.
   (proc (heap-share ptr)
     (validate-heap-ptr "heap-share" "share" ptr)
@@ -41,17 +32,23 @@
   ; Obtain a memory block on the heap with a given size. A pointer to the block
   ; gets pushed onto the stack.
   (proc (heap-allocate size)
-    (variables i)
+    (variables i curr-block-size)
     ; Look for an unallocated block that's big enough
-    (for heap-allocate-index (length heap)
-      (heap-f1 size)
-      (when (= heap-allocate-found-block true)
-        (append stack heap-allocate-index)
-        (write heap-allocate-index size)
-        (replace heap-refcounts heap-allocate-index 1)
-        (for i size
-          (replace heap-refcounts (+ heap-allocate-index i) "Infinity"))
-        (stop-this-script)))
+    (:= curr-block-size 0)
+    (for i (length heap)
+      (if (= 0 (!! heap-refcounts i))
+        (then
+          (+= curr-block-size 1)
+          (when (> curr-block-size size)
+            (append stack (- i size))
+            (replace heap-refcounts (- i size) 1)
+            (write (- i size) size)
+            (repeat size
+              (replace heap-refcounts i "Infinity")
+              (-= i 1))
+            (stop-this-script)))
+        (else
+          (:= curr-block-size 0))))
 
     ; No existing block found, grow the heap
     (append heap size)
