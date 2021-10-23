@@ -1,0 +1,4 @@
+(sprite "main"
+  (proc (when-received "_switch_interp_step_exit")
+    (:= interp-responded true)
+    (write (interp->status the-interp) INTERP-STATUS-DEAD)))

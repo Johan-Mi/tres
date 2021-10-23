@@ -1,12 +1,18 @@
 ; # Interpreter
 ; - Memory block size
 ; - "Interpreter"
+; - Status
 ; - Pointer to vector of tokens
 ; - Instruction pointer
 ; - Pointer to stack
 
+(macro INTERP-STATUS-ACTIVE "Active")
+(macro INTERP-STATUS-DEAD "Dead")
+
+(include "src/interp/instructions.scratch")
+
 (sprite "main"
-  (variables interp-responded)
+  (variables interp-responded the-interp)
 
   (proc (interp-spawn-from-src src)
     (interp-new)
@@ -16,8 +22,9 @@
     (pop))
 
   (proc (interp-new)
-    (heap-allocate 4)
+    (heap-allocate 5)
     (write (block->type (last-of stack)) "Interpreter")
+    (write (interp->status (last-of stack)) "Active")
     (write (interp->ip (last-of stack)) 0)
     (vec-new)
     (write (interp->tokens (!!- stack 1)) (last-of stack))
@@ -41,11 +48,12 @@
 
   (proc (interp-step interp)
     (variables ip curr-token)
+    (:= the-interp interp)
+    (assert (= (interp.status interp) INTERP-STATUS-ACTIVE)
+            "interp-step: tried to step inactive interpreter")
     (:= ip (+ 1 (interp.ip interp)))
-    (assert (< ip (vec.size (interp.tokens interp)))
-            (++ "interp-step: ip "
-                (+ 1 ip)
-                " is out of bounds"))
+    (assert (not (> ip (vec.size (interp.tokens interp))))
+            (++ "interp-step: ip " ip " is out of bounds"))
 
     (write (interp->ip interp) ip)
     (:= curr-token (vec.at (interp.tokens interp) ip))

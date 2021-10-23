@@ -23,7 +23,7 @@
     (create-directory "bin" fs-root)
     (create-directory "etc" fs-root)
     (ls "/" "/")
-    (interp-spawn-from-src "foo")
+    (interp-spawn-from-src "5 10 exit")
     (forever
       (processes-step)))
 

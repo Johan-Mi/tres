@@ -19,7 +19,7 @@
             (++ message ", which is before the start of the heap"))
     (assert (not (> ptr (length heap)))
             (++ message ", which is after the end of the heap"))
-    (assert (!! heap-refcounts ptr)
+    (assert (> (!! heap-refcounts ptr) 0)
             (++ message ", which points to unallocated memory"))
     (assert (!= (!! heap-refcounts ptr) "Infinity")
             (++ message ", which is in the middle of a memory block")))

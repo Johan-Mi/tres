@@ -6,9 +6,18 @@
     (pop-to process-table))
 
   (proc (processes-step)
-    (variables i)
-    (when (= 0 (vec.size process-table))
-      (panic "processes-step: process table is empty so nothing can happen"))
+    (variables process)
+    (assert (> (vec.size process-table) 0)
+            "processes-step: process table is empty so nothing can happen")
 
-    (for i (vec.size process-table)
-      (interp-step (vec.at process-table i)))))
+    (for process (vec.size process-table)
+      ; Iterate in reverse so processes can be removed without interfering with
+      ; the next iteration
+      (:= process (- (+ 1 (vec.size process-table)) process))
+
+      (:= process (vec.at process-table process))
+      (interp-step process)
+
+      ; Remove the process from the table if it's dead
+      (when (= INTERP-STATUS-DEAD (interp.status process))
+        (vec-remove-first-occurence process-table process)))))

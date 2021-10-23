@@ -48,4 +48,15 @@
     ([]+= heap (vec->size (last-of stack)) 1)
     (write
       (vec->at (last-of stack) (vec.size (last-of stack)))
-      value)))
+      value))
+
+  ; Remove the first occurence of a value from a vector. If the vector doesn't
+  ; contain the value, nothing happens.
+  (proc (vec-remove-first-occurence vec value)
+    (variables i j)
+    (for i (vec.size vec)
+      (when (= value (vec.at vec i))
+        (for j (- (vec.size vec) i)
+          (write (vec->at vec (+ i j -1)) (vec.at vec (+ i j))))
+        ([]+= heap (vec->size vec) -1)
+        (stop-this-script)))))
