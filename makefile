@@ -1,4 +1,7 @@
-project.sb3: src/*.scratch assets/**/*
+SRC_FILES=$(shell find src -name '*.scratch')
+ASSETS=$(shell find assets -type f)
+
+project.sb3: $(SRC_FILES) $(ASSETS)
 	scratch-compiler-exe src/main.scratch
 
 .PHONY: clean
