@@ -1,4 +1,94 @@
+(macro (def-op name op)
+       (proc (when-received (str-concat! "_switch_interp_step_" ,name))
+         (:= interp-responded true)
+         ,op))
+
+(macro (def-simple-op-1 name op)
+       (def-op
+         ,name
+         (do
+           (assert (> (vec.size (interp.stack the-interp)) 0)
+                   (str-concat! "interp-step: not enough arguments for `"
+                                ,name
+                                "`"))
+           (modify (vec->last (interp.stack the-interp)) ,op))))
+
+(macro (def-simple-op-2 name op)
+       (def-op
+         ,name
+         (do
+           (assert (> (vec.size (interp.stack the-interp)) 1)
+                   (str-concat! "interp-step: not enough arguments for `"
+                                ,name
+                                "`"))
+           (write (vec->at- (interp.stack the-interp) 1)
+                  (,op (vec.at- (interp.stack the-interp) 1)
+                       (vec.last (interp.stack the-interp))))
+           (vec-shrink-by (interp.stack the-interp) 1))))
+
 (sprite "main"
-  (proc (when-received "_switch_interp_step_exit")
-    (:= interp-responded true)
-    (write (interp->status the-interp) INTERP-STATUS-DEAD)))
+  (def-op
+    "exit"
+    (write (interp->status the-interp) INTERP-STATUS-DEAD))
+
+  (def-op
+    "print"
+    (do
+      (assert (> (vec.size (interp.stack the-interp)) 0)
+              (str-concat! "interp-step: not enough arguments for `print`"))
+      (print (vec.last (interp.stack the-interp)))
+      (vec-shrink-by (interp.stack the-interp) 1)))
+
+  (def-op
+    "println"
+    (do
+      (assert (> (vec.size (interp.stack the-interp)) 0)
+              (str-concat! "interp-step: not enough arguments for `println`"))
+      (println (vec.last (interp.stack the-interp)))
+      (vec-shrink-by (interp.stack the-interp) 1)))
+
+  (def-op "linebreak" (linebreak))
+
+  (def-op
+    "dup"
+    (do
+      (assert (> (vec.size (interp.stack the-interp)) 0)
+              (str-concat! "interp-step: not enough arguments for `dup`"))
+      (vec-push (interp->stack the-interp)
+                (vec.last (interp.stack the-interp)))))
+
+  (def-op
+    "pop"
+    (do
+      (assert (> (vec.size (interp.stack the-interp)) 0)
+              (str-concat! "interp-step: not enough arguments for `pop`"))
+      (vec-shrink-by (interp.stack the-interp) 1)))
+
+  (def-simple-op-1 "not" not)
+  (def-simple-op-1 "abs" abs)
+  (def-simple-op-1 "floor" floor)
+  (def-simple-op-1 "ceil" ceil)
+  (def-simple-op-1 "sqrt" sqrt)
+  (def-simple-op-1 "ln" ln)
+  (def-simple-op-1 "log" log)
+  (def-simple-op-1 "e^" e^)
+  (def-simple-op-1 "ten^" ten^)
+  (def-simple-op-1 "sin" sin)
+  (def-simple-op-1 "cos" cos)
+  (def-simple-op-1 "tan" tan)
+  (def-simple-op-1 "asin" asin)
+  (def-simple-op-1 "acos" acos)
+  (def-simple-op-1 "atan" atan)
+  (def-simple-op-1 "str-length" str-length)
+  (def-simple-op-2 "+" +)
+  (def-simple-op-2 "-" -)
+  (def-simple-op-2 "*" *)
+  (def-simple-op-2 "/" /)
+  (def-simple-op-2 "mod" mod)
+  (def-simple-op-2 "++" ++)
+  (def-simple-op-2 ">" >)
+  (def-simple-op-2 "<" <)
+  (def-simple-op-2 "=" =)
+  (def-simple-op-2 "!=" !=)
+  (def-simple-op-2 "and" and)
+  (def-simple-op-2 "or" or))

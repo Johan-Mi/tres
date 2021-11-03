@@ -16,6 +16,9 @@
 (macro ([]+= lst idx val)
        (replace ,lst ,idx (+ (!! ,lst ,idx) ,val)))
 
+(macro ([]-= lst idx val)
+       (replace ,lst ,idx (- (!! ,lst ,idx) ,val)))
+
 (macro (!!- lst idx)
        (!! ,lst (- (length ,lst) ,idx)))
 
