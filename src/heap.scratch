@@ -94,4 +94,11 @@
     (heap-allocate new-size)
     (for i (read old-ptr)
       (write (+ (last-of stack) i) (read (+ old-ptr i))))
-    (heap-deallocate old-ptr)))
+    (heap-deallocate old-ptr))
+
+  ; Swaps two indices on the heap.
+  (proc (heap-swap ptr-a ptr-b)
+    (variables swapper)
+    (:= swapper (read ptr-a))
+    (write ptr-a (read ptr-b))
+    (write ptr-b swapper)))

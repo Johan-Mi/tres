@@ -3,24 +3,25 @@
          (:= interp-responded true)
          ,op))
 
-(macro (def-simple-op-1 name op)
+(macro (def-op-taking name num-args op)
        (def-op
          ,name
          (do
-           (assert (> (vec.size (interp.stack the-interp)) 0)
+           (assert (> (vec.size (interp.stack the-interp)) (- ,num-args 1))
                    (str-concat! "interp-step: not enough arguments for `"
                                 ,name
                                 "`"))
-           (modify (vec->last (interp.stack the-interp)) ,op))))
+           ,op)))
+
+(macro (def-simple-op-1 name op)
+       (def-op-taking
+         ,name 1
+         (modify (vec->last (interp.stack the-interp)) ,op)))
 
 (macro (def-simple-op-2 name op)
-       (def-op
-         ,name
+       (def-op-taking
+         ,name 2
          (do
-           (assert (> (vec.size (interp.stack the-interp)) 1)
-                   (str-concat! "interp-step: not enough arguments for `"
-                                ,name
-                                "`"))
            (write (vec->at- (interp.stack the-interp) 1)
                   (,op (vec.at- (interp.stack the-interp) 1)
                        (vec.last (interp.stack the-interp))))
@@ -31,39 +32,102 @@
     "exit"
     (write (interp->status the-interp) INTERP-STATUS-DEAD))
 
-  (def-op
-    "print"
+  (def-op-taking
+    "write" 2
     (do
-      (assert (> (vec.size (interp.stack the-interp)) 0)
-              (str-concat! "interp-step: not enough arguments for `print`"))
+      (write (vec.at- (interp.stack the-interp) 1)
+             (vec.last (interp.stack the-interp)))
+      (vec-shrink-by (interp.stack the-interp) 2)))
+
+  (def-op-taking
+    "print" 1
+    (do
       (print (vec.last (interp.stack the-interp)))
       (vec-shrink-by (interp.stack the-interp) 1)))
 
-  (def-op
-    "println"
+  (def-op-taking
+    "println" 1
     (do
-      (assert (> (vec.size (interp.stack the-interp)) 0)
-              (str-concat! "interp-step: not enough arguments for `println`"))
       (println (vec.last (interp.stack the-interp)))
       (vec-shrink-by (interp.stack the-interp) 1)))
 
   (def-op "linebreak" (linebreak))
 
-  (def-op
-    "dup"
-    (do
-      (assert (> (vec.size (interp.stack the-interp)) 0)
-              (str-concat! "interp-step: not enough arguments for `dup`"))
-      (vec-push (interp->stack the-interp)
-                (vec.last (interp.stack the-interp)))))
+  (def-op-taking
+    "dup" 1
+    (vec-push (interp->stack the-interp)
+              (vec.last (interp.stack the-interp))))
 
-  (def-op
-    "pop"
+  (def-op-taking
+    "2dup" 2
+    (repeat 2
+      (vec-push (interp->stack the-interp)
+                (vec.at- (interp.stack the-interp) 1))))
+
+  (def-op-taking
+    "drop" 1
+    (vec-shrink-by (interp.stack the-interp) 1))
+
+  (def-op-taking
+    "2drop" 2
+    (vec-shrink-by (interp.stack the-interp) 2))
+
+  (def-op-taking
+    "over" 2
+    (vec-push (interp->stack the-interp)
+              (vec.at- (interp.stack the-interp) 1)))
+
+  (def-op-taking
+    "2over" 4
+    (repeat 2
+      (vec-push (interp->stack the-interp)
+                (vec.at- (interp.stack the-interp) 3))))
+
+  (def-op-taking
+    "swap" 2
+    (heap-swap (vec->last (interp.stack the-interp))
+               (vec->at- (interp.stack the-interp) 1)))
+
+  (def-op-taking
+    "2swap" 4
     (do
-      (assert (> (vec.size (interp.stack the-interp)) 0)
-              (str-concat! "interp-step: not enough arguments for `pop`"))
+      (heap-swap (vec->at- (interp.stack the-interp) 3)
+                 (vec->at- (interp.stack the-interp) 1))
+      (heap-swap (vec->at- (interp.stack the-interp) 2)
+                 (vec->last (interp.stack the-interp)))))
+
+  (def-op-taking
+    "nip" 2
+    (do
+      (write (vec->at- (interp.stack the-interp) 1)
+             (vec.last (interp.stack the-interp)))
       (vec-shrink-by (interp.stack the-interp) 1)))
 
+  (def-op-taking
+    "rot" 3
+    (do
+      (heap-swap (vec->at- (interp.stack the-interp) 2)
+                 (vec->at- (interp.stack the-interp) 1))
+      (heap-swap (vec->at- (interp.stack the-interp) 1)
+                 (vec->last (interp.stack the-interp)))))
+
+  (def-op-taking
+    "-rot" 3
+    (do
+      (heap-swap (vec->at- (interp.stack the-interp) 1)
+                 (vec->last (interp.stack the-interp)))
+      (heap-swap (vec->at- (interp.stack the-interp) 2)
+                 (vec->at- (interp.stack the-interp) 1))))
+
+  (def-op-taking
+    "tuck" 2
+    (do
+      (vec-push (interp->stack the-interp)
+                (vec.last (interp.stack the-interp))) 
+      (heap-swap (vec->at- (interp.stack the-interp) 2)
+                 (vec->at- (interp.stack the-interp) 1))))
+
+  (def-simple-op-1 "read" read)
   (def-simple-op-1 "not" not)
   (def-simple-op-1 "abs" abs)
   (def-simple-op-1 "floor" floor)
