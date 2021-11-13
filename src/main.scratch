@@ -12,9 +12,11 @@
   (costumes "backdrop" "assets/backdrop.png"))
 
 (sprite "main"
+  (variables should-shutdown)
   (lists stack)
 
   (proc (when-flag-clicked)
+    (:= should-shutdown false)
     (stack-init)
     (heap-init)
     (term-init)
@@ -23,9 +25,10 @@
     (create-directory "bin" fs-root)
     (create-directory "etc" fs-root)
     (ls "/" "/")
-    (interp-spawn-from-src "6 dup 1 + * println exit")
-    (forever
-      (processes-step)))
+    (interp-spawn-from-src "6 dup 1 + * println shutdown")
+    (until (= true should-shutdown)
+      (processes-step))
+    (println "System has been shut down."))
 
   (proc (stack-init)
     (delete-all stack))

@@ -69,7 +69,7 @@
                 (++ "resolve-path: Could not resolve path `" path "`"))))
           (:= lexer-buf ""))
         (else
-          (:= lexer-buf (++ lexer-buf (char-at path i)))))))
+          (++= lexer-buf (char-at path i))))))
 
   (proc (find-name-in-directory name)
     (variables i)

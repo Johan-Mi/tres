@@ -12,7 +12,7 @@
 (macro (vec.at ptr i)
        (read (vec->at ,ptr ,i)))
 (macro (vec.cap ptr)
-       (- (!! heap ,ptr) 2))
+       (- (read ,ptr) 2))
 (macro (vec->last ptr)
        (vec->at ,ptr (vec.size ,ptr)))
 (make-field-dot vec last)
