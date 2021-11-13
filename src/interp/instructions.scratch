@@ -179,7 +179,7 @@
     (do
       (vec-shrink-by (vec.last the.stack) 1)
       (write (vec->last the.stack)
-             (vec.last (vec.last the.stack)))))
+             (vec.at- (vec.last the.stack) -1))))
 
   (def-simple-op-1 "read" read)
   (def-simple-op-1 "not" not)
