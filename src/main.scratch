@@ -37,7 +37,12 @@
     (processes-init))
 
   (proc (shutdown)
+    (variables i)
     (println "Shutting down…")
+    (heap-deallocate fs-root)
+    (for i (vec.size process-table)
+      (heap-deallocate (vec.at process-table i)))
+    (heap-deallocate process-table)
     (detect-memory-leaks)
     (println "System has been shut down."))
 

@@ -33,6 +33,10 @@
     (write (interp->stack (!!- stack 1)) (last-of stack))
     (pop))
 
+  (proc (when-received "_switch_heap_deallocate_Interpreter")
+    (append deallocations (interp.tokens (last-of stack)))
+    (append deallocations (interp.stack (last-of stack))))
+
   (proc (interp-lex interp str)
     (variables i lexer-buf)
     (:= lexer-buf "")

@@ -6,7 +6,7 @@
        (write ,idx (,op (read ,idx))))
 
 (sprite "main"
-  (lists heap heap-refcounts)
+  (lists heap heap-refcounts deallocations)
 
   ; Make sure that a pointer points to the beginning of a valid memory block on
   ; the heap.
@@ -64,19 +64,27 @@
   ; count reaches 0. Custom destructors can be created by respondning to the
   ; message "_switch_heap_deallocate_X" where X is the type of the block being
   ; deallocated. When the message is received, a pointer to the block is
-  ; available on the stack and should not be removed.
+  ; available on the stack and should not be removed. Do not deallocate
+  ; recursively, instead add pointers to the `deallocations` list.
   (proc (heap-deallocate ptr)
-    (variables i)
-    (validate-heap-ptr "heap-deallocate" "deallocate" ptr)
-    ([]-= heap-refcounts ptr 1)
-    (when (= 0 (!! heap-refcounts ptr))
-      (append stack ptr)
-      (send-broadcast-sync (++ "_switch_heap_deallocate_" (block.type ptr)))
-      (pop)
-      (for i (read ptr)
-        (write (+ ptr i) "")
-        (replace heap-refcounts (+ ptr i) 0))
-      (write ptr "")))
+    (variables i curr-ptr)
+    (delete-all deallocations)
+    (append deallocations ptr)
+    (until (= 0 (length deallocations))
+      (:= curr-ptr (last-of deallocations))
+      (delete-last deallocations)
+
+      (validate-heap-ptr "heap-deallocate" "deallocate" curr-ptr)
+      ([]-= heap-refcounts curr-ptr 1)
+      (when (= 0 (!! heap-refcounts curr-ptr))
+        (append stack curr-ptr)
+        (send-broadcast-sync (++ "_switch_heap_deallocate_"
+                                 (block.type curr-ptr)))
+        (pop)
+        (for i (read curr-ptr)
+          (write (+ curr-ptr i) "")
+          (replace heap-refcounts (+ curr-ptr i) 0))
+        (write curr-ptr ""))))
 
   (proc (heap-init)
     (delete-all heap)

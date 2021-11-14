@@ -43,6 +43,12 @@
     (write (file->content (last-of stack)) content)
     (add-ptr-to-directory (last-of stack) parent))
 
+  (proc (when-received "_switch_heap_deallocate_Directory")
+    (variables i)
+    (for i (vec.size (file.content (last-of stack)))
+      (append deallocations (vec.at (file.content (last-of stack)) i)))
+    (append deallocations (file.content (last-of stack))))
+
   (proc (resolve-path cwd path)
     (variables i lexer-buf)
     (if (= "/" (char-at path 1))
