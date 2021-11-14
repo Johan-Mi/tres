@@ -16,18 +16,29 @@
   (lists stack)
 
   (proc (when-flag-clicked)
+    (init)
+
+    (create-directory "bin" fs-root)
+    (create-directory "etc" fs-root)
+    (ls "/" "/")
+    (interp-spawn-from-src "6 dup 1 + * println shutdown")
+
+    (until (= true should-shutdown)
+      (processes-step))
+
+    (shutdown))
+
+  (proc (init)
     (:= should-shutdown false)
     (stack-init)
     (heap-init)
     (term-init)
     (create-fs-root)
-    (processes-init)
-    (create-directory "bin" fs-root)
-    (create-directory "etc" fs-root)
-    (ls "/" "/")
-    (interp-spawn-from-src "6 dup 1 + * println shutdown")
-    (until (= true should-shutdown)
-      (processes-step))
+    (processes-init))
+
+  (proc (shutdown)
+    (println "Shutting down…")
+    (detect-memory-leaks)
     (println "System has been shut down."))
 
   (proc (stack-init)
@@ -72,6 +83,22 @@
         (for i (- width 1)
           (replace-last stack (++ (last-of stack) (char-at string i))))
         (replace-last stack (++ (last-of stack) "…")))))
+
+  (proc (detect-memory-leaks)
+    (variables i leaked-blocks leaked-amount)
+    (:= leaked-blocks 0)
+    (:= leaked-amount 0)
+    (for i (length heap)
+      (unless (or (= 0 (!! heap-refcounts i))
+                  (= "Infinity" (!! heap-refcounts i)))
+        (+= leaked-blocks 1)
+        (+= leaked-amount (read i))))
+    (assert (= leaked-blocks 0)
+            (++ "Memory leak: leaked "
+                leaked-blocks
+                " blocks, "
+                leaked-amount
+                " elements")))
 
   (proc (ls cwd path)
     (variables i)
