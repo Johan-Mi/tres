@@ -170,16 +170,22 @@
       (vec-shrink-by the.stack 1)))
 
   (def-op-taking
-    "vec-last" 1
-    (write (vec->last the.stack)
-           (vec.last (vec.last the.stack))))
-
-  (def-op-taking
     "vec-pop" 1
     (do
       (vec-shrink-by (vec.last the.stack) 1)
       (write (vec->last the.stack)
              (vec.at- (vec.last the.stack) -1))))
+
+  (def-simple-op-1 "vec.size" vec.size)
+  (def-simple-op-2 "vec->at" vec->at)
+  (def-simple-op-2 "vec.at" vec.at)
+  (def-simple-op-1 "vec->last" vec->last)
+  (def-simple-op-1 "vec.last" vec.last)
+  (def-simple-op-2 "vec->at-" vec->at-)
+  (def-simple-op-2 "vec.at-" vec.at-)
+
+  (def-simple-op-1 "block->type" block->type)
+  (def-simple-op-1 "block.type" block.type)
 
   (def-simple-op-1 "read" read)
   (def-simple-op-1 "not" not)
