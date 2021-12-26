@@ -1,0 +1,1 @@
+6 dup 1 + * println shutdown

@@ -19,9 +19,10 @@
     (init)
 
     (create-directory "bin" fs-root)
-    (create-directory "etc" fs-root)
-    (ls "/" "/")
-    (interp-spawn-from-src "6 dup 1 + * println shutdown")
+    (create-file "shell" (last-of stack) (include-str "src/shell"))
+    (pop)
+    (pop)
+    (interp-spawn-from-path "/" "/bin/shell")
 
     (until (= true should-shutdown)
       (processes-step))

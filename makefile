@@ -1,4 +1,4 @@
-SRC_FILES=$(shell find src -name '*.scratch')
+SRC_FILES=$(shell find src -type f)
 ASSETS=$(shell find assets -type f)
 
 project.sb3: $(SRC_FILES) $(ASSETS)

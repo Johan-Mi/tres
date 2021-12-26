@@ -21,6 +21,11 @@
     (pop-to process-table)
     (pop))
 
+  (proc (interp-spawn-from-path cwd path)
+    (resolve-path cwd path)
+    (interp-spawn-from-src (file.content (last-of stack)))
+    (pop))
+
   (proc (interp-new)
     (heap-allocate 5)
     (write (block->type (last-of stack)) "Interpreter")
