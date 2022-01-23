@@ -71,6 +71,7 @@
           ":" "assets/chars/colon.png"
           ";" "assets/chars/semicolon.png"
           "/" "assets/chars/slash.png"
+          "*" "assets/chars/asterisk.png"
           "!" "assets/chars/exclamation.png"
           "`" "assets/chars/backtick.png"
           "∞" "assets/chars/infinity.png"
