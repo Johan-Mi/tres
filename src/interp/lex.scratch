@@ -1,0 +1,16 @@
+(sprite "main"
+  (proc (interp-lex interp str)
+    (variables chr buf)
+    (:= buf "")
+    (for chr (str-length str)
+      (:= chr (char-at str chr))
+      (cond
+        (= " " chr)
+        (then
+          (unless (= "" buf)
+            (vec-push (interp->tokens interp) buf)
+            (:= buf "")))
+        (else
+          (++= buf chr))))
+    (unless (= "" buf)
+      (vec-push (interp->tokens interp) buf))))

@@ -9,6 +9,7 @@
 (macro INTERP-STATUS-ACTIVE "Active")
 (macro INTERP-STATUS-DEAD "Dead")
 
+(include "src/interp/lex.scratch")
 (include "src/interp/instructions.scratch")
 
 (sprite "main"
@@ -41,19 +42,6 @@
   (proc (when-received "_switch_heap_deallocate_Interpreter")
     (append deallocations (interp.tokens (last-of stack)))
     (append deallocations (interp.stack (last-of stack))))
-
-  (proc (interp-lex interp str)
-    (variables i lexer-buf)
-    (:= lexer-buf "")
-    (for i (+ 1 (str-length str)) ; +1 to correctly push the last token
-      (if (or (= i (+ 1 (str-length str)))
-              (= " " (char-at str i)))
-        (then
-          (unless (= "" lexer-buf)
-            (vec-push (interp->tokens interp) lexer-buf)
-            (:= lexer-buf "")))
-        (else
-          (++= lexer-buf (char-at str i))))))
 
   (proc (interp-step interp)
     (variables ip curr-token)
