@@ -1,16 +1,49 @@
+(macro INTERP-LEX-STATE-NORMAL 1)
+(macro INTERP-LEX-STATE-QUOTES 2)
+(macro INTERP-LEX-STATE-BACKSLASH 3)
+
 (sprite "main"
   (proc (interp-lex interp str)
-    (variables chr buf)
+    (variables chr buf state)
+    (:= state INTERP-LEX-STATE-NORMAL)
     (:= buf "")
     (for chr (str-length str)
       (:= chr (char-at str chr))
       (cond
+        (= state INTERP-LEX-STATE-QUOTES)
+        (then
+          (cond
+            (= chr "\"")
+            (then
+              (:= state INTERP-LEX-STATE-NORMAL)
+              (vec-push (interp->tokens interp) buf)
+              (:= buf ""))
+            (= chr "\\")
+            (then
+              (:= state INTERP-LEX-STATE-BACKSLASH))
+            (else
+              (++= buf chr))))
+        (= state INTERP-LEX-STATE-BACKSLASH)
+        (then
+          (assert (or (= chr "\"")
+                      (= chr "\\"))
+                  (++ "interp-lex: invalid escape sequence: `\\" chr "`"))
+          (++= buf chr)
+          (:= state INTERP-LEX-STATE-QUOTES))
         (= " " chr)
         (then
           (unless (= "" buf)
             (vec-push (interp->tokens interp) buf)
             (:= buf "")))
+        (= "\"" chr)
+        (then
+          (:= state INTERP-LEX-STATE-QUOTES)
+          (unless (= "" buf)
+            (vec-push (interp->tokens interp) buf)
+            (:= buf "")))
         (else
           (++= buf chr))))
+    (assert (= state INTERP-LEX-STATE-NORMAL)
+            "interp-lex: unfinished string literal")
     (unless (= "" buf)
       (vec-push (interp->tokens interp) buf))))
