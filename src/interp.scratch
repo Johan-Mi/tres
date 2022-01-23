@@ -59,6 +59,15 @@
       (then
         (vec-push (interp->stack interp) curr-token))
 
+      (= "@" curr-token)
+      (then
+        (+= ip 1)
+        (assert (not (> ip (vec.size (interp.tokens interp))))
+                (++ "interp-step: ip " ip " is out of bounds"))
+        (write (interp->ip interp) ip)
+        (vec-push (interp->stack interp)
+                  (vec.at (interp.tokens interp) ip)))
+
       (else
         (:= interp-responded false)
         (send-broadcast-sync (++ "_switch_interp_step_" curr-token))

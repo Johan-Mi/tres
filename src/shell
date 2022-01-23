@@ -1,1 +1,3 @@
+"Running example program:" println
+"> 6 dup 1 + * println" println
 6 dup 1 + * println shutdown
