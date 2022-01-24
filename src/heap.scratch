@@ -12,11 +12,7 @@
   ; the heap.
   (proc (validate-heap-ptr caller verb ptr)
     (variables message)
-    (:= message (++ caller
-                    ": Tried to "
-                    verb
-                    " index "
-                    ptr))
+    (:= message (++ caller ": Tried to " verb " index " ptr))
     (assert (> ptr 0)
             (++ message ", which is before the start of the heap"))
     (assert (not (> ptr (length heap)))

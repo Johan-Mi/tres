@@ -29,9 +29,7 @@
       (pop))
 
     ([]+= heap (vec->size (read vec)) 1)
-    (write
-      (vec->at (read vec) (vec.size (read vec)))
-      value))
+    (write (vec->last (read vec)) value))
 
   ; Like `vec-push` but `vec` has one less level of indirection and the new
   ; pointer gets pushed to the stack. This can be used instead of `vec-push` if
@@ -46,9 +44,7 @@
         (append stack vec)))
 
     ([]+= heap (vec->size (last-of stack)) 1)
-    (write
-      (vec->at (last-of stack) (vec.size (last-of stack)))
-      value))
+    (write (vec->last (last-of stack)) value))
 
   ; Remove the first occurence of a value from a vector. If the vector doesn't
   ; contain the value, nothing happens.
