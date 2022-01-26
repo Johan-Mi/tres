@@ -61,6 +61,12 @@
   (def-op "linebreak" (linebreak))
 
   (def-op-taking
+    "ask" 1
+    (do
+      (ask (vec.last the.stack))
+      (write (vec->last the.stack) answer)))
+
+  (def-op-taking
     "dup" 1
     (vec-push the->stack
               (vec.last the.stack)))
@@ -175,6 +181,23 @@
       (vec-shrink-by (vec.last the.stack) 1)
       (write (vec->last the.stack)
              (vec.at- (vec.last the.stack) -1))))
+
+  (def-op-taking
+    "interp-spawn-from-src" 2
+    (do
+      (interp-spawn-from-src (vec.at- the.stack 1) (vec.last the.stack))
+      (vec-shrink-by the.stack 2)))
+
+  (def-op-taking
+    "interp-spawn-from-path" 2
+    (do
+      (interp-spawn-from-path (vec.at- the.stack 1) (vec.last the.stack))
+      (vec-shrink-by the.stack 2)))
+
+  (def-op
+    "get-cwd"
+    (vec-push the->stack (interp.cwd the-interp)))
+
 
   (def-simple-op-1 "vec.size" vec.size)
   (def-simple-op-2 "vec->at" vec->at)

@@ -5,6 +5,7 @@
 ; - Pointer to vector of tokens
 ; - Instruction pointer
 ; - Pointer to stack
+; - Current working directory
 
 (macro INTERP-STATUS-ACTIVE "Active")
 (macro INTERP-STATUS-DEAD "Dead")
@@ -15,8 +16,8 @@
 (sprite "main"
   (variables interp-responded the-interp)
 
-  (proc (interp-spawn-from-src src)
-    (interp-new)
+  (proc (interp-spawn-from-src cwd src)
+    (interp-new cwd)
     (interp-lex (last-of stack) src)
     (vec-push-stack process-table (last-of stack))
     (pop-to process-table)
@@ -24,14 +25,15 @@
 
   (proc (interp-spawn-from-path cwd path)
     (resolve-path cwd path)
-    (interp-spawn-from-src (file.content (last-of stack)))
+    (interp-spawn-from-src cwd (file.content (last-of stack)))
     (pop))
 
-  (proc (interp-new)
-    (heap-allocate 5)
+  (proc (interp-new cwd)
+    (heap-allocate 6)
     (write (block->type (last-of stack)) "Interpreter")
     (write (interp->status (last-of stack)) "Active")
     (write (interp->ip (last-of stack)) 0)
+    (write (interp->cwd (last-of stack)) cwd)
     (vec-new)
     (write (interp->tokens (!!- stack 1)) (last-of stack))
     (pop)

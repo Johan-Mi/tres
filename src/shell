@@ -1,3 +1,9 @@
-"Running example program:" println
-"> 6 dup 1 + * println" println
-6 dup 1 + * println shutdown
+"> " print
+get-cwd dup
+"Enter some code to run" ask
+dup println
+" exit" ++
+interp-spawn-from-src
+
+"/bin/shell" interp-spawn-from-path
+exit

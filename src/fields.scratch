@@ -39,3 +39,5 @@
 (make-field-dot interp ip)
 (make-field-arrow interp->stack 5)
 (make-field-dot interp stack)
+(make-field-arrow interp->cwd 6)
+(make-field-dot interp cwd)
