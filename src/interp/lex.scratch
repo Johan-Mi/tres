@@ -31,7 +31,7 @@
                   (++ "interp-lex: invalid escape sequence: `\\" chr "`"))
           (++= buf chr)
           (:= state INTERP-LEX-STATE-QUOTES))
-        (= " " chr)
+        (whitespace? chr)
         (then
           (unless (= "" buf)
             (vec-push (interp->tokens interp) buf)

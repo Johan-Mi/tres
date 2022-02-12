@@ -35,6 +35,10 @@
        (or (= 0 ,str)
            (= ,str (+ 0 ,str))))
 
+(macro (whitespace? chr)
+       (or (= " " chr)
+           (= "\n" chr)))
+
 (macro (pop)
        (delete-last stack))
 
