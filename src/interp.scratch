@@ -57,7 +57,7 @@
     (write (interp->ip interp) ip)
     (:= curr-token (vec.at (interp.tokens interp) ip))
     (cond
-      (is-number curr-token)
+      (number? curr-token)
       (then
         (vec-push (interp->stack interp) curr-token))
 
