@@ -1,7 +1,7 @@
 (macro CHAR-HEIGHT 12)
 (macro CHAR-WIDTH 8)
 (macro CHAR-SCALE 200)
-(macro CHAR-NEWLINE "¦")
+(macro CHAR-NEWLINE "\n")
 
 (sprite "main"
   (include "src/char-costumes.scratch")
