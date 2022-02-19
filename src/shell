@@ -1,9 +1,10 @@
 "> " print
-get-cwd dup
+get-cwd
 "Enter some code to run" ask
 dup println
 " exit" ++
-interp-spawn-from-src
-
-"/bin/shell" interp-spawn-from-path
+interp-spawn-from-src dup
+get-cwd "/bin/shell" interp-spawn-from-path
+interp-add-waker
+interp-awaken
 exit

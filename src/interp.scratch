@@ -6,9 +6,11 @@
 ; - Instruction pointer
 ; - Pointer to stack
 ; - Current working directory
+; - Pointer to vector of wakers
 
 (macro INTERP-STATUS-ACTIVE "Active")
 (macro INTERP-STATUS-DEAD "Dead")
+(macro INTERP-STATUS-ASLEEP "Asleep")
 
 (include "src/interp/lex.scratch")
 (include "src/interp/instructions.scratch")
@@ -20,18 +22,17 @@
     (interp-new cwd)
     (interp-lex (last-of stack) src)
     (vec-push-stack process-table (last-of stack))
-    (pop-to process-table)
-    (pop))
+    (pop-to process-table))
 
   (proc (interp-spawn-from-path cwd path)
     (resolve-path cwd path)
     (interp-spawn-from-src cwd (file.content (last-of stack)))
-    (pop))
+    (delete- stack 1))
 
   (proc (interp-new cwd)
-    (heap-allocate 6)
+    (heap-allocate 7)
     (write (block->type (last-of stack)) "Interpreter")
-    (write (interp->status (last-of stack)) "Active")
+    (write (interp->status (last-of stack)) INTERP-STATUS-ASLEEP)
     (write (interp->ip (last-of stack)) 0)
     (write (interp->cwd (last-of stack)) cwd)
     (vec-new)
@@ -39,14 +40,24 @@
     (pop)
     (vec-new)
     (write (interp->stack (!!- stack 1)) (last-of stack))
+    (pop)
+    (vec-new)
+    (write (interp->wakers (!!- stack 1)) (last-of stack))
     (pop))
+
+  (proc (interp-awaken interp)
+    (assert (!= (interp.status interp) INTERP-STATUS-DEAD)
+            "interp-awaken: tried to awaken dead interpreter")
+    (write (interp->status interp) INTERP-STATUS-ACTIVE))
 
   (proc (when-received "_switch_heap_deallocate_Interpreter")
     (append deallocations (interp.tokens (last-of stack)))
-    (append deallocations (interp.stack (last-of stack))))
+    (append deallocations (interp.stack (last-of stack)))
+    (append deallocations (interp.wakers (last-of stack))))
 
   (proc (interp-step interp)
     (variables ip curr-token)
+
     (:= the-interp interp)
     (assert (= (interp.status interp) INTERP-STATUS-ACTIVE)
             "interp-step: tried to step inactive interpreter")

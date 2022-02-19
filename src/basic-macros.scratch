@@ -28,6 +28,9 @@
 (macro (delete-last lst)
        (delete ,lst "last"))
 
+(macro (delete- lst idx)
+       (delete ,lst (- (length ,lst) ,idx)))
+
 (macro (replace-last lst val)
        (replace ,lst "last" ,val))
 

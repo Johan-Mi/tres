@@ -6,9 +6,8 @@
     (pop-to process-table))
 
   (proc (processes-step)
-    (variables process)
-    (assert (> (vec.size process-table) 0)
-            "processes-step: process table is empty so nothing can happen")
+    (variables deadlocked process waker)
+    (:= deadlocked true)
 
     (for process (vec.size process-table)
       ; Iterate in reverse so processes can be removed without interfering with
@@ -16,8 +15,14 @@
       (:= process (- (+ 1 (vec.size process-table)) process))
 
       (:= process (vec.at process-table process))
-      (interp-step process)
+      (unless (= (interp.status process) INTERP-STATUS-ASLEEP)
+        (:= deadlocked false)
+        (interp-step process)
 
-      ; Remove the process from the table if it's dead
-      (when (= INTERP-STATUS-DEAD (interp.status process))
-        (vec-remove-first-occurence process-table process)))))
+        ; Remove the process from the table if it's dead
+        (when (= INTERP-STATUS-DEAD (interp.status process))
+          (for waker (vec.size (interp.wakers process))
+            (interp-awaken (vec.at (interp.wakers process) waker)))
+          (vec-remove-first-occurence process-table process))))
+    (assert (= deadlocked false)
+            "processes-step: no processes ran, system is deadlocked")))

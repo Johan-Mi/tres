@@ -186,18 +186,33 @@
     "interp-spawn-from-src" 2
     (do
       (interp-spawn-from-src (vec.at- the.stack 1) (vec.last the.stack))
-      (vec-shrink-by the.stack 2)))
+      (vec-shrink-by the.stack 1)
+      (write (vec->last the.stack) (last-of stack))
+      (pop)))
 
   (def-op-taking
     "interp-spawn-from-path" 2
     (do
       (interp-spawn-from-path (vec.at- the.stack 1) (vec.last the.stack))
+      (vec-shrink-by the.stack 1)
+      (write (vec->last the.stack) (last-of stack))
+      (pop)))
+
+  (def-op-taking
+    "interp-awaken" 1
+    (do
+      (interp-awaken (vec.last the.stack))
+      (vec-shrink-by the.stack 1)))
+
+  (def-op-taking
+    "interp-add-waker" 2
+    (do
+      (vec-push (interp->wakers (vec.at- the.stack 1)) (vec.last the.stack))
       (vec-shrink-by the.stack 2)))
 
   (def-op
     "get-cwd"
     (vec-push the->stack (interp.cwd the-interp)))
-
 
   (def-simple-op-1 "vec.size" vec.size)
   (def-simple-op-2 "vec->at" vec->at)

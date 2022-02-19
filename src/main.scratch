@@ -23,6 +23,8 @@
     (pop)
     (pop)
     (interp-spawn-from-path "/" "/bin/shell")
+    (interp-awaken (last-of stack))
+    (pop)
 
     (until (= true should-shutdown)
       (processes-step))

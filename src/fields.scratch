@@ -41,3 +41,5 @@
 (make-field-dot interp stack)
 (make-field-arrow interp->cwd 6)
 (make-field-dot interp cwd)
+(make-field-arrow interp->wakers 7)
+(make-field-dot interp wakers)
