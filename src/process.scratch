@@ -23,6 +23,7 @@
         (when (= INTERP-STATUS-DEAD (interp.status process))
           (for waker (vec.size (interp.wakers process))
             (interp-awaken (vec.at (interp.wakers process) waker)))
+          (heap-deallocate process)
           (vec-remove-first-occurence process-table process))))
     (assert (= deadlocked false)
             "processes-step: no processes ran, system is deadlocked")))
