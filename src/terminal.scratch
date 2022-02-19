@@ -7,10 +7,14 @@
   (include "src/char-costumes.scratch")
 
   (proc (term-init)
-    (erase-all)
     (hide)
-    (set-xy -232 172)
-    (set-size CHAR-SCALE))
+    (set-size CHAR-SCALE)
+    (term-clear))
+
+  ; Clear the terminal
+  (proc (term-clear)
+    (erase-all)
+    (set-xy -232 172))
 
   ; Print a single character to the terminal.
   (proc (putchar char)

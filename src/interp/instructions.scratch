@@ -60,6 +60,8 @@
 
   (def-op "linebreak" (linebreak))
 
+  (def-op "term-clear" (term-clear))
+
   (def-op-taking
     "ask" 1
     (do
