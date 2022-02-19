@@ -52,46 +52,6 @@
   (proc (stack-init)
     (delete-all stack))
 
-  (proc (heap-dump)
-    (variables i)
-    (println ">heap-dump")
-    (println "Ptr │Value                                   │Refcount")
-    (println "────┼────────────────────────────────────────┼────────")
-    (for i (length heap)
-      (rightpad i 4 " ")
-      (rightpad (read i) 40 " ")
-      (if (= (!! heap-refcounts i) "Infinity")
-        (then
-          (println (++ (!!- stack 1) "│" (last-of stack) "│∞")))
-        (else
-          (println (++ (!!- stack 1)
-                       "│"
-                       (last-of stack)
-                       "│"
-                       (!! heap-refcounts i)))))
-      (pop)
-      (pop)))
-
-  ; Force a string to a certain width by truncating it or filling the remaining
-  ; space to the right with a given character. The result gets pushed onto the
-  ; stack.
-  (proc (rightpad string width padding-char)
-    (variables i)
-    (cond
-      (< (str-length string) width)
-      (then
-        (append stack string)
-        (repeat (- width (str-length string))
-          (replace-last stack (++ (last-of stack) padding-char))))
-      (= (str-length string) width)
-      (then
-        (append stack string))
-      (else
-        (append stack "")
-        (for i (- width 1)
-          (replace-last stack (++ (last-of stack) (char-at string i))))
-        (replace-last stack (++ (last-of stack) "…")))))
-
   (proc (detect-memory-leaks)
     (variables i leaked-blocks leaked-amount)
     (:= leaked-blocks 0)
@@ -106,13 +66,4 @@
                 leaked-blocks
                 " blocks, "
                 leaked-amount
-                " elements")))
-
-  (proc (ls cwd path)
-    (variables i)
-    (resolve-path cwd path)
-    (println (++ "Listing of " path ":"))
-    (replace-last stack (file.content (last-of stack)))
-    (for i (vec.size (last-of stack))
-      (println (file.name (vec.at (last-of stack) i))))
-    (pop)))
+                " elements"))))
