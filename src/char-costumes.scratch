@@ -74,6 +74,7 @@
           "*" "assets/chars/asterisk.png"
           "!" "assets/chars/exclamation.png"
           "`" "assets/chars/backtick.png"
+          "\"" "assets/chars/double_quote.png"
           "∞" "assets/chars/infinity.png"
           "…" "assets/chars/ellipsis.png"
           "│" "assets/chars/boxdrawing_light_vertical.png"
