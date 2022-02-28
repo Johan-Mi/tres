@@ -216,6 +216,12 @@
     "get-cwd"
     (vec-push the->stack (interp.cwd the-interp)))
 
+  (def-op-taking
+    "heap-deallocate" 1
+    (do
+      (heap-deallocate (vec.last the.stack))
+      (vec-shrink-by the.stack 1)))
+
   (def-simple-op-1 "vec.size" vec.size)
   (def-simple-op-2 "vec->at" vec->at)
   (def-simple-op-2 "vec.at" vec.at)
