@@ -16,7 +16,7 @@
             (= chr "\"")
             (then
               (:= state INTERP-LEX-STATE-NORMAL)
-              (vec-push (interp->tokens interp) "@")
+              (vec-push (interp->tokens interp) "'")
               (vec-push (interp->tokens interp) buf)
               (:= buf ""))
             (= chr "\\")

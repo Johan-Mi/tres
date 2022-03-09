@@ -40,7 +40,7 @@
     (:= should-shutdown true))
 
   (def-op-taking
-    "write" 2
+    "!" 2
     (do
       (write (vec.at- the.stack 1)
              (vec.last the.stack))
@@ -233,7 +233,7 @@
   (def-simple-op-1 "block->type" block->type)
   (def-simple-op-1 "block.type" block.type)
 
-  (def-simple-op-1 "read" read)
+  (def-simple-op-1 "@" read)
   (def-simple-op-1 "not" not)
   (def-simple-op-1 "abs" abs)
   (def-simple-op-1 "floor" floor)

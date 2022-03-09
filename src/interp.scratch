@@ -72,7 +72,7 @@
       (then
         (vec-push (interp->stack interp) curr-token))
 
-      (= "@" curr-token)
+      (= "'" curr-token)
       (then
         (+= ip 1)
         (assert (not (> ip (vec.size (interp.tokens interp))))
