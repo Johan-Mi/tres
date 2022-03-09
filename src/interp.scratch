@@ -7,6 +7,8 @@
 ; - Pointer to stack
 ; - Current working directory
 ; - Pointer to vector of wakers
+; - Pointer to vector of variable names
+; - Pointer to vector of variable values
 
 (macro INTERP-STATUS-ACTIVE "Active")
 (macro INTERP-STATUS-DEAD "Dead")
@@ -30,7 +32,7 @@
     (delete- stack 1))
 
   (proc (interp-new cwd)
-    (heap-allocate 7)
+    (heap-allocate 9)
     (write (block->type (last-of stack)) "Interpreter")
     (write (interp->status (last-of stack)) INTERP-STATUS-ASLEEP)
     (write (interp->ip (last-of stack)) 0)
@@ -43,6 +45,12 @@
     (pop)
     (vec-new)
     (write (interp->wakers (!!- stack 1)) (last-of stack))
+    (pop)
+    (vec-new)
+    (write (interp->var-names (!!- stack 1)) (last-of stack))
+    (pop)
+    (vec-new)
+    (write (interp->var-values (!!- stack 1)) (last-of stack))
     (pop))
 
   (proc (interp-awaken interp)
@@ -53,7 +61,9 @@
   (proc (when-received "_switch_heap_deallocate_Interpreter")
     (append deallocations (interp.tokens (last-of stack)))
     (append deallocations (interp.stack (last-of stack)))
-    (append deallocations (interp.wakers (last-of stack))))
+    (append deallocations (interp.wakers (last-of stack)))
+    (append deallocations (interp.var-names (last-of stack)))
+    (append deallocations (interp.var-values (last-of stack))))
 
   (proc (interp-step interp)
     (variables ip curr-token)
@@ -81,8 +91,24 @@
         (vec-push (interp->stack interp)
                   (vec.at (interp.tokens interp) ip)))
 
+      (= "$" (char-at curr-token 1))
+      (then
+        (interp-lookup-var curr-token))
+
       (else
         (:= interp-responded false)
         (send-broadcast-sync (++ "_switch_interp_step_" curr-token))
         (assert interp-responded
-                (++ "interp-step: unknown instruction `" curr-token "`"))))))
+                (++ "interp-step: unknown instruction `" curr-token "`")))))
+
+  (proc (interp-lookup-var name)
+    (variables i)
+    (for i (vec.size (interp.var-names the-interp))
+      (when (= name (vec.at (interp.var-names the-interp) i))
+        (vec-push (interp->stack the-interp)
+                  (vec->at (interp.var-values the-interp) i))
+        (stop-this-script)))
+    (vec-push (interp->var-names the-interp) name)
+    (vec-push (interp->var-values the-interp) "")
+    (vec-push (interp->stack the-interp)
+              (vec->last (interp.var-values the-interp)))))

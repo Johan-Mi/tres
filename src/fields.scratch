@@ -43,3 +43,7 @@
 (make-field-dot interp cwd)
 (make-field-arrow interp->wakers 7)
 (make-field-dot interp wakers)
+(make-field-arrow interp->var-names 8)
+(make-field-dot interp var-names)
+(make-field-arrow interp->var-values 9)
+(make-field-dot interp var-values)
