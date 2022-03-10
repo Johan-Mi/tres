@@ -222,6 +222,27 @@
       (heap-deallocate (vec.last the.stack))
       (vec-shrink-by the.stack 1)))
 
+  (def-op-taking
+    "jump" 1
+    (do
+      (interp-jump (vec.last the.stack))
+      (vec-shrink-by the.stack 1)))
+
+  (def-op-taking
+    "jump-if" 2
+    (do
+      (when (vec.at- the.stack 1)
+        (interp-jump (vec.last the.stack)))
+      (vec-shrink-by the.stack 2)))
+
+  (proc (interp-jump label)
+    (variables i)
+    (for i (vec.size (interp.tokens the-interp))
+      (when (= label (vec.at (interp.tokens the-interp) i))
+        (write (interp->ip the-interp) i)
+        (stop-this-script)))
+    (panic (++ "interp-jump: label `" label "` does not exist")))
+
   (def-simple-op-1 "vec.size" vec.size)
   (def-simple-op-2 "vec->at" vec->at)
   (def-simple-op-2 "vec.at" vec.at)

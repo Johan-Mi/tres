@@ -95,6 +95,9 @@
       (then
         (interp-lookup-var curr-token))
 
+      (= ":" (char-at curr-token 1))
+      (then)
+
       (else
         (:= interp-responded false)
         (send-broadcast-sync (++ "_switch_interp_step_" curr-token))
