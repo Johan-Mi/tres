@@ -212,6 +212,14 @@
       (vec-push (interp->wakers (vec.at- the.stack 1)) (vec.last the.stack))
       (vec-shrink-by the.stack 2)))
 
+  (def-op-taking
+    "interp-block-on" 1
+    (do
+      (vec-push (interp->wakers (vec.last the.stack)) the-interp)
+      (write (interp->status the-interp) INTERP-STATUS-ASLEEP)
+      (interp-awaken (vec.last the.stack))
+      (vec-shrink-by the.stack 1)))
+
   (def-op
     "get-cwd"
     (vec-push the->stack (interp.cwd the-interp)))

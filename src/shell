@@ -1,10 +1,8 @@
+:loop
 "> " print
 get-cwd
 "Enter some code to run" ask
 dup println
 " exit" ++
-interp-spawn-from-src dup
-get-cwd "/bin/shell" interp-spawn-from-path
-interp-add-waker
-interp-awaken
-exit
+interp-spawn-from-src interp-block-on
+":loop" jump
