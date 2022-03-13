@@ -70,7 +70,11 @@
 
     (:= the-interp interp)
     (assert (= (interp.status interp) INTERP-STATUS-ACTIVE)
-            "interp-step: tried to step inactive interpreter")
+            (++ "interp-step: tried to step interpreter at `"
+                interp
+                "` with status `"
+                (interp.status interp)
+                "`"))
     (:= ip (+ 1 (interp.ip interp)))
     (assert (not (> ip (vec.size (interp.tokens interp))))
             (++ "interp-step: ip " ip " is out of bounds"))
