@@ -6,13 +6,14 @@
     (pop-to process-table))
 
   (proc (processes-step)
-    (variables deadlocked process waker)
+    (variables process-count deadlocked process waker)
     (:= deadlocked true)
+    (:= process-count (vec.size process-table))
 
-    (for process (vec.size process-table)
+    (for process process-count
       ; Iterate in reverse so processes can be removed without interfering with
       ; the next iteration
-      (:= process (- (+ 1 (vec.size process-table)) process))
+      (:= process (- (+ 1 process-count) process))
 
       (:= process (vec.at process-table process))
       (unless (= (interp.status process) INTERP-STATUS-ASLEEP)
