@@ -3,10 +3,12 @@
 (macro INTERP-LEX-STATE-BACKSLASH 3)
 
 (sprite "main"
+  (variables interp-lex-buf)
+
   (proc (interp-lex interp str)
-    (variables chr buf state)
+    (variables chr state)
     (:= state INTERP-LEX-STATE-NORMAL)
-    (:= buf "")
+    (:= interp-lex-buf "")
     (for chr (str-length str)
       (:= chr (char-at str chr))
       (cond
@@ -17,34 +19,40 @@
             (then
               (:= state INTERP-LEX-STATE-NORMAL)
               (vec-push (interp->tokens interp) "'")
-              (vec-push (interp->tokens interp) buf)
-              (:= buf ""))
+              (vec-push (interp->tokens interp) interp-lex-buf)
+              (:= interp-lex-buf ""))
             (= chr "\\")
             (then
               (:= state INTERP-LEX-STATE-BACKSLASH))
             (else
-              (++= buf chr))))
+              (++= interp-lex-buf chr))))
         (= state INTERP-LEX-STATE-BACKSLASH)
         (then
           (assert (or (= chr "\"")
                       (= chr "\\"))
                   (++ "interp-lex: invalid escape sequence: `\\" chr "`"))
-          (++= buf chr)
+          (++= interp-lex-buf chr)
           (:= state INTERP-LEX-STATE-QUOTES))
         (whitespace? chr)
         (then
-          (unless (= "" buf)
-            (vec-push (interp->tokens interp) buf)
-            (:= buf "")))
+          (interp-lex-push-buf interp))
         (= "\"" chr)
         (then
           (:= state INTERP-LEX-STATE-QUOTES)
-          (unless (= "" buf)
-            (vec-push (interp->tokens interp) buf)
-            (:= buf "")))
+          (interp-lex-push-buf interp))
         (else
-          (++= buf chr))))
+          (++= interp-lex-buf chr))))
     (assert (= state INTERP-LEX-STATE-NORMAL)
             "interp-lex: unfinished string literal")
-    (unless (= "" buf)
-      (vec-push (interp->tokens interp) buf))))
+    (interp-lex-push-buf interp))
+
+  (proc (interp-lex-push-buf interp)
+    (unless (= "" interp-lex-buf)
+      (if (= ":" (char-at interp-lex-buf 1))
+        (then
+          (vec-push (interp->var-names interp) interp-lex-buf)
+          (vec-push (interp->var-values interp)
+                    (vec.size (interp.tokens interp))))
+        (else
+          (vec-push (interp->tokens interp) interp-lex-buf)))
+      (:= interp-lex-buf ""))))

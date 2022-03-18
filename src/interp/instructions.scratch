@@ -245,9 +245,10 @@
 
   (proc (interp-jump label)
     (variables i)
-    (for i (vec.size (interp.tokens the-interp))
-      (when (= label (vec.at (interp.tokens the-interp) i))
-        (write (interp->ip the-interp) i)
+    (for i (vec.size (interp.var-names the-interp))
+      (when (= label (vec.at (interp.var-names the-interp) i))
+        (write (interp->ip the-interp)
+               (vec.at (interp.var-values the-interp) i))
         (stop-this-script)))
     (panic (++ "interp-jump: label `" label "` does not exist")))
 
