@@ -17,10 +17,6 @@
 (sprite "main"
   (variables fs-root)
 
-  (proc (create-fs-root)
-    (create-directory "root" 0)
-    (pop-to fs-root))
-
   (proc (create-directory name parent)
     (heap-allocate 4)
     (write (block->type (last-of stack)) "Directory")
