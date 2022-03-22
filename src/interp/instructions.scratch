@@ -220,6 +220,16 @@
       (interp-awaken (vec.last the.stack))
       (vec-shrink-by the.stack 1)))
 
+  (def-op-taking
+    "run" 1
+    (do
+      (interp-spawn-from-path (interp.cwd the-interp) (vec.last the.stack))
+      (vec-push (interp->wakers (last-of stack)) the-interp)
+      (write (interp->status the-interp) INTERP-STATUS-ASLEEP)
+      (interp-awaken (last-of stack))
+      (pop)
+      (vec-shrink-by the.stack 1)))
+
   (def-op
     "get-cwd"
     (vec-push the->stack (interp.cwd the-interp)))
