@@ -7,6 +7,7 @@
 (include "src/fs.scratch")
 (include "src/interp.scratch")
 (include "src/process.scratch")
+(include "create-fs.scratch")
 
 (sprite "Stage"
   (costumes "backdrop" "assets/backdrop.png"))
@@ -18,10 +19,6 @@
   (proc (when-flag-clicked)
     (init)
 
-    (create-directory "bin" fs-root)
-    (create-file "shell" (last-of stack) (include-str "src/shell"))
-    (pop)
-    (pop)
     (interp-spawn-from-path "/" "/bin/shell")
     (interp-awaken (last-of stack))
     (pop)
@@ -36,7 +33,7 @@
     (stack-init)
     (heap-init)
     (term-init)
-    (create-fs-root)
+    (create-fs)
     (processes-init))
 
   (proc (shutdown)

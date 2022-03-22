@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+
+walk() {
+	for f in $1/*
+	do
+		if [ -f "$f" ]; then
+			echo "    (create-file \"$(basename $f)\" (last-of stack) (include-str \"$f\"))"
+			echo "    (pop)"
+		elif [ -d "$f" ]; then
+			echo "    (create-directory \"$(basename $f)\" (last-of stack))"
+			walk "$f"
+			echo "    (pop)"
+		fi
+	done
+}
+
+(
+	echo '(sprite "main"'
+	echo '  (proc (create-fs)'
+    echo '    (create-directory "root" 0)'
+	walk fs
+	echo '    (pop-to fs-root)))'
+) > create-fs.scratch
