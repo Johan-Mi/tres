@@ -35,7 +35,7 @@
        (replace ,lst "last" ,val))
 
 (macro (number? str)
-       (= ,str (+ 0 ,str)))
+       (= ,str (to-num ,str)))
 
 (macro (whitespace? chr)
        (or (= " " chr)
