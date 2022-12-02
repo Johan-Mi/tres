@@ -10,10 +10,7 @@
        (def-op
          ,name
          (do
-           (assert (> (vec.size the.stack) (- ,num-args 1))
-                   (str-concat! "interp-step: not enough arguments for `"
-                                ,name
-                                "`"))
+           (interp-step-require-args ,name ,num-args)
            ,op)))
 
 (macro (def-simple-op-1 name op)
@@ -31,6 +28,10 @@
            (vec-shrink-by the.stack 1))))
 
 (sprite "main"
+  (proc (interp-step-require-args name num-args)
+    (assert (> (vec.size the.stack) (- num-args 1))
+            (++ "interp-step: not enough arguments for `" name "`")))
+
   (def-op
     "exit"
     (write (interp->status the-interp) INTERP-STATUS-DEAD))
