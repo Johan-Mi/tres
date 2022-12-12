@@ -32,6 +32,9 @@
     (assert (> (vec.size the.stack) (- num-args 1))
             (++ "interp-step: not enough arguments for `" name "`")))
 
+  (proc (interp-shrink-stack amount)
+    (vec-shrink-by the.stack amount))
+
   (def-op
     "exit"
     (write (interp->status the-interp) INTERP-STATUS-DEAD))
@@ -45,19 +48,19 @@
     (do
       (write (vec.at- the.stack 1)
              (vec.last the.stack))
-      (vec-shrink-by the.stack 2)))
+      (interp-shrink-stack 2)))
 
   (def-op-taking
     "print" 1
     (do
       (print (vec.last the.stack))
-      (vec-shrink-by the.stack 1)))
+      (interp-shrink-stack 1)))
 
   (def-op-taking
     "println" 1
     (do
       (println (vec.last the.stack))
-      (vec-shrink-by the.stack 1)))
+      (interp-shrink-stack 1)))
 
   (def-op "linebreak" (linebreak))
 
@@ -82,11 +85,11 @@
 
   (def-op-taking
     "drop" 1
-    (vec-shrink-by the.stack 1))
+    (interp-shrink-stack 1))
 
   (def-op-taking
     "2drop" 2
-    (vec-shrink-by the.stack 2))
+    (interp-shrink-stack 2))
 
   (def-op-taking
     "over" 2
@@ -117,7 +120,7 @@
     (do
       (write (vec->at- the.stack 1)
              (vec.last the.stack))
-      (vec-shrink-by the.stack 1)))
+      (interp-shrink-stack 1)))
 
   (def-op-taking
     "rot" 3
@@ -163,20 +166,20 @@
     (do
       (vec-push (vec->at- the.stack 1)
                 (vec.last the.stack))
-      (vec-shrink-by the.stack 1)))
+      (interp-shrink-stack 1)))
 
   (def-op-taking
     "vec-remove-first-occurence" 2
     (do
       (vec-remove-first-occurence (vec.at- the.stack 1)
                                   (vec.last the.stack))
-      (vec-shrink-by the.stack 2)))
+      (interp-shrink-stack 2)))
 
   (def-op-taking
     "vec-drop" 1
     (do
       (vec-shrink-by (vec.last the.stack) 1)
-      (vec-shrink-by the.stack 1)))
+      (interp-shrink-stack 1)))
 
   (def-op-taking
     "vec-pop" 1
@@ -189,7 +192,7 @@
     "interp-spawn-from-src" 2
     (do
       (interp-spawn-from-src (vec.at- the.stack 1) (vec.last the.stack))
-      (vec-shrink-by the.stack 1)
+      (interp-shrink-stack 1)
       (write (vec->last the.stack) (last-of stack))
       (pop)))
 
@@ -197,7 +200,7 @@
     "interp-spawn-from-path" 2
     (do
       (interp-spawn-from-path (vec.at- the.stack 1) (vec.last the.stack))
-      (vec-shrink-by the.stack 1)
+      (interp-shrink-stack 1)
       (write (vec->last the.stack) (last-of stack))
       (pop)))
 
@@ -205,13 +208,13 @@
     "interp-awaken" 1
     (do
       (interp-awaken (vec.last the.stack))
-      (vec-shrink-by the.stack 1)))
+      (interp-shrink-stack 1)))
 
   (def-op-taking
     "interp-add-waker" 2
     (do
       (vec-push (interp->wakers (vec.at- the.stack 1)) (vec.last the.stack))
-      (vec-shrink-by the.stack 2)))
+      (interp-shrink-stack 2)))
 
   (def-op-taking
     "interp-block-on" 1
@@ -219,7 +222,7 @@
       (vec-push (interp->wakers (vec.last the.stack)) the-interp)
       (write (interp->status the-interp) INTERP-STATUS-ASLEEP)
       (interp-awaken (vec.last the.stack))
-      (vec-shrink-by the.stack 1)))
+      (interp-shrink-stack 1)))
 
   (def-op-taking
     "run" 1
@@ -229,7 +232,7 @@
       (write (interp->status the-interp) INTERP-STATUS-ASLEEP)
       (interp-awaken (last-of stack))
       (pop)
-      (vec-shrink-by the.stack 1)))
+      (interp-shrink-stack 1)))
 
   (def-op
     "get-cwd"
@@ -239,20 +242,20 @@
     "heap-deallocate" 1
     (do
       (heap-deallocate (vec.last the.stack))
-      (vec-shrink-by the.stack 1)))
+      (interp-shrink-stack 1)))
 
   (def-op-taking
     "jump" 1
     (do
       (interp-jump (vec.last the.stack))
-      (vec-shrink-by the.stack 1)))
+      (interp-shrink-stack 1)))
 
   (def-op-taking
     "jump-if" 2
     (do
       (when (vec.at- the.stack 1)
         (interp-jump (vec.last the.stack)))
-      (vec-shrink-by the.stack 2)))
+      (interp-shrink-stack 2)))
 
   (proc (interp-jump label)
     (variables i)
