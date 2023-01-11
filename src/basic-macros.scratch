@@ -1,9 +1,6 @@
 (macro then do)
 (macro else do)
 
-(macro true "true")
-(macro false "false")
-
 (macro (!= a b)
        (not (= ,a ,b)))
 
