@@ -1,3 +1,5 @@
+(macro x86_64 (str=! "x86_64" COMPILER-OPTIONS.TARGET))
+
 (include "src/basic-macros.scratch")
 (include "src/error-handling.scratch")
 (include "src/fields.scratch")
@@ -32,7 +34,8 @@
     (:= should-shutdown false)
     (stack-init)
     (heap-init)
-    (term-init)
+    (unless x86_64
+      (term-init))
     (create-fs)
     (processes-init))
 

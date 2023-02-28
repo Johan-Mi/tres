@@ -2,49 +2,57 @@
 (macro CHAR-WIDTH 8)
 (macro CHAR-SCALE 200)
 
+(unless! x86_64
+  (sprite "main"
+    (include "src/char-costumes.scratch")
+
+    (proc (term-init)
+      (hide)
+      (set-size CHAR-SCALE)
+      (term-clear))
+
+    ; Move the terminal cursor right by one characer, possibly switching to the
+    ; next line.
+    (proc (move-cursor-right)
+      (if (< x-pos 228)
+        (then
+          (change-x CHAR-WIDTH))
+        (else
+          (linebreak))))
+
+    ; Print a string to the terminal.
+    (proc (print string)
+      (variables i)
+      (for i (str-length string)
+        (putchar (char-at string i))))))
+
 (sprite "main"
-  (include "src/char-costumes.scratch")
-
-  (proc (term-init)
-    (hide)
-    (set-size CHAR-SCALE)
-    (term-clear))
-
   ; Clear the terminal
   (proc (term-clear)
-    (erase-all)
-    (set-xy -232 172))
+    (if x86_64
+      (print "\x1b[3J")
+      (else
+        (erase-all)
+        (set-xy -232 172))))
 
   ; Print a single character to the terminal.
   (proc (putchar char)
-    (if (= char "\n")
-      (then
-        (linebreak))
+    (cond
+      x86_64 (print char)
+      (= char "\n") (linebreak)
       (else
         (set-costume "[unknown]")
         (set-costume char)
         (stamp)
         (move-cursor-right))))
 
-  ; Move the terminal cursor right by one characer, possibly switching to the
-  ; next line.
-  (proc (move-cursor-right)
-    (if (< x-pos 228)
-      (then
-        (change-x CHAR-WIDTH))
-      (else
-        (linebreak))))
-
   ; Move the terminal cursor to the beginning of the next line.
   (proc (linebreak)
-    (set-x -232)
-    (change-y (- CHAR-HEIGHT)))
-
-  ; Print a string to the terminal.
-  (proc (print string)
-    (variables i)
-    (for i (str-length string)
-      (putchar (char-at string i))))
+    (if x86_64
+      (print "\n")
+      (else
+        (set-x -232)
+        (change-y (- CHAR-HEIGHT)))))
 
   ; Print a string to the terminal, followed by a new line.
   (proc (println string)

@@ -1,3 +1,6 @@
 /project.sb3
 /program.scratch
 /create-fs.scratch
+/project
+/prelude.s
+*.o
