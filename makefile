@@ -17,10 +17,6 @@ project: project.o prelude.o
 create-fs.scratch: $(FS_CONTENT)
 	./rebuild-fs
 
-.PHONY: lint
-lint: $(SRC_FILES)
-	scratch-compiler-exe compile --lint src/main.scratch
-
 .PHONY: clean
 clean:
 	@$(RM) -v project.sb3 project *.o
