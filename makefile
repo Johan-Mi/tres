@@ -7,10 +7,10 @@ ASFLAGS := -felf64
 LDFLAGS := -lm
 
 project.sb3: $(SRC_FILES) $(ASSETS) create-fs.scratch
-	scratch-compiler-exe src/main.scratch
+	scratch-compiler-exe compile src/main.scratch
 
 project.o: $(SRC_FILES) $(ASSETS) create-fs.scratch
-	scratch-compiler-exe --target=x86_64 src/main.scratch
+	scratch-compiler-exe compile --target=x86_64 src/main.scratch
 
 project: project.o prelude.o
 
@@ -19,7 +19,7 @@ create-fs.scratch: $(FS_CONTENT)
 
 .PHONY: lint
 lint: $(SRC_FILES)
-	scratch-compiler-exe --lint src/main.scratch
+	scratch-compiler-exe compile --lint src/main.scratch
 
 .PHONY: clean
 clean:
