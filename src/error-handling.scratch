@@ -1,5 +1,5 @@
 (macro (assert condition message)
-       (real-assert ,condition ,message))
+  (real-assert ,condition ,message))
 
 (sprite "main"
   (variables panic-message)

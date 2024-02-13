@@ -1,9 +1,9 @@
 (macro (read idx)
-       (!! heap ,idx))
+  (!! heap ,idx))
 (macro (write idx val)
-       (replace heap ,idx ,val))
+  (replace heap ,idx ,val))
 (macro (modify idx op)
-       (write ,idx (,op (read ,idx))))
+  (write ,idx (,op (read ,idx))))
 
 (sprite "main"
   (lists heap heap-refcounts deallocations)

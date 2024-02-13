@@ -2,30 +2,30 @@
 (macro the.stack (interp.stack the-interp))
 
 (macro (def-op name op)
-       (proc (when-received (str-concat! "_switch_interp_step_" ,name))
-         (:= interp-responded true)
-         ,op))
+  (proc (when-received (str-concat! "_switch_interp_step_" ,name))
+    (:= interp-responded true)
+    ,op))
 
 (macro (def-op-taking name num-args op)
-       (def-op
-         ,name
-         (do
-           (interp-step-require-args ,name ,num-args)
-           ,op)))
+  (def-op
+    ,name
+    (do
+      (interp-step-require-args ,name ,num-args)
+      ,op)))
 
 (macro (def-simple-op-1 name op)
-       (def-op-taking
-         ,name 1
-         (modify (vec->last the.stack) ,op)))
+  (def-op-taking
+    ,name 1
+    (modify (vec->last the.stack) ,op)))
 
 (macro (def-simple-op-2 name op)
-       (def-op-taking
-         ,name 2
-         (do
-           (write (vec->at- the.stack 1)
-                  (,op (vec.at- the.stack 1)
-                       (vec.last the.stack)))
-           (vec-shrink-by the.stack 1))))
+  (def-op-taking
+    ,name 2
+    (do
+      (write (vec->at- the.stack 1)
+             (,op (vec.at- the.stack 1)
+               (vec.last the.stack)))
+      (vec-shrink-by the.stack 1))))
 
 (sprite "main"
   (proc (interp-step-require-args name num-args)

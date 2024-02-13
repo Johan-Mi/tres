@@ -3,28 +3,28 @@
 (macro CHAR-SCALE 200)
 
 (unless! x86_64
-  (sprite "main"
-    (include "src/char-costumes.scratch")
+         (sprite "main"
+           (include "src/char-costumes.scratch")
 
-    (proc (term-init)
-      (hide)
-      (set-size CHAR-SCALE)
-      (term-clear))
+           (proc (term-init)
+             (hide)
+             (set-size CHAR-SCALE)
+             (term-clear))
 
-    ; Move the terminal cursor right by one characer, possibly switching to the
-    ; next line.
-    (proc (move-cursor-right)
-      (if (< x-pos 228)
-        (then
-          (change-x CHAR-WIDTH))
-        (else
-          (linebreak))))
+           ; Move the terminal cursor right by one characer, possibly switching to the
+           ; next line.
+           (proc (move-cursor-right)
+             (if (< x-pos 228)
+               (then
+                 (change-x CHAR-WIDTH))
+               (else
+                 (linebreak))))
 
-    ; Print a string to the terminal.
-    (proc (print string)
-      (variables i)
-      (for i (str-length string)
-        (putchar (char-at string i))))))
+           ; Print a string to the terminal.
+           (proc (print string)
+             (variables i)
+             (for i (str-length string)
+               (putchar (char-at string i))))))
 
 (sprite "main"
   ; Clear the terminal

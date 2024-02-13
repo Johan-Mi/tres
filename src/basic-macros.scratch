@@ -2,46 +2,46 @@
 (macro else do)
 
 (macro (!= a b)
-       (not (= ,a ,b)))
+  (not (= ,a ,b)))
 
 (macro (-= a b)
-       (+= ,a (- ,b)))
+  (+= ,a (- ,b)))
 
 (macro (++= a b)
-       (:= ,a (++ ,a ,b)))
+  (:= ,a (++ ,a ,b)))
 
 (macro ([]+= lst idx val)
-       (replace ,lst ,idx (+ (!! ,lst ,idx) ,val)))
+  (replace ,lst ,idx (+ (!! ,lst ,idx) ,val)))
 
 (macro ([]-= lst idx val)
-       (replace ,lst ,idx (- (!! ,lst ,idx) ,val)))
+  (replace ,lst ,idx (- (!! ,lst ,idx) ,val)))
 
 (macro (!!- lst idx)
-       (!! ,lst (- (length ,lst) ,idx)))
+  (!! ,lst (- (length ,lst) ,idx)))
 
 (macro (last-of lst)
-       (!! ,lst "last"))
+  (!! ,lst "last"))
 
 (macro (delete-last lst)
-       (delete ,lst "last"))
+  (delete ,lst "last"))
 
 (macro (delete- lst idx)
-       (delete ,lst (- (length ,lst) ,idx)))
+  (delete ,lst (- (length ,lst) ,idx)))
 
 (macro (replace-last lst val)
-       (replace ,lst "last" ,val))
+  (replace ,lst "last" ,val))
 
 (macro (number? str)
-       (= ,str (to-num ,str)))
+  (= ,str (to-num ,str)))
 
 (macro (whitespace? chr)
-       (or (= " " chr)
-           (= "\n" chr)))
+  (or (= " " chr)
+      (= "\n" chr)))
 
 (macro (pop)
-       (delete-last stack))
+  (delete-last stack))
 
 (macro (pop-to var)
-       (do
-         (:= ,var (last-of stack))
-         (pop)))
+  (do
+    (:= ,var (last-of stack))
+    (pop)))
